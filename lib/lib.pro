@@ -4,32 +4,22 @@
 #
 #-------------------------------------------------
 
-QT       += xml
-
+# Qt Modules
 QT       -= gui
 
+# Versioning
+VER_MIN = 1
+exists($$PWD/../version.pri) : include($$PWD/../version.pri)
+
+# Project Information
 TARGET = NexusCoordinator
 TEMPLATE = lib
 
 DEFINES += NEXUSCOORDINATOR_LIBRARY
 
-SOURCES += nexuscoordinator.cpp
+SOURCES += nexuscoordinator.cpp \
+    coordinatorservice.cpp
 
 HEADERS += nexuscoordinator.h\
-        nexuscoordinator_global.h
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusComm/release/ -lNexusComm
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusComm/debug/ -lNexusComm
-else:unix: LIBS += -L$$OUT_PWD/../extern/NexusComm/ -lNexusComm
-
-INCLUDEPATH += $$PWD/../extern/NexusComm
-DEPENDPATH += $$PWD/../extern/NexusComm
+        nexuscoordinator_global.h \
+    coordinatorservice.h
