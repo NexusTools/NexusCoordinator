@@ -1,0 +1,9 @@
+[submodule "NexusComm"]
+	path = NexusComm
+	url = https://github.com/NexusTools/NexusComm.git
+[submodule "extern/NexusComm"]
+	path = extern/NexusComm
+	url = https://github.com/NexusTools/NexusComm.git
+[submodule "extern/NexusConfig"]
+	path = extern/NexusConfig
+	url = https://github.com/NexusTools/NexusConfig.git
