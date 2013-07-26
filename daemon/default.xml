@@ -1,0 +1,14 @@
+<NexusCoordinator>
+	<Services>
+		<Service class="ControlServer">
+			<Protocols>
+				<Protocol class="TelnetController" />
+				<Protocol class="LocalSocketController" />
+				<Protocol class="HTTPController" />
+			</Protocols>
+		</Service>
+	</Services>
+	<Modules>
+		<Module class="ServerManagment" />
+	</Modules>
+</NexusCoordinator>

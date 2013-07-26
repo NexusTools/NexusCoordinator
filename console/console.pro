@@ -7,10 +7,6 @@
 # Qt Modules
 QT       -= gui
 
-# Versioning
-VER_MIN = 1
-exists($$PWD/../version.pri) : include($$PWD/../version.pri)
-
 # Project Information
 TARGET = NexusCoordinatorConsole
 CONFIG   += console
@@ -18,5 +14,9 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+# Versioning
+VER_MIN = 1
+exists($$PWD/../version.pri) : include($$PWD/../version.pri)
 
+# Files
 SOURCES += main.cpp

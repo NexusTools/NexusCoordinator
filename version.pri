@@ -11,7 +11,7 @@ greaterThan(BRANCH_COUNT, 1) {
 	DEFINES += $$quote(GIT_BRANCH=\'\"$$GIT_BRANCH\"\')
 	DEFINES += $$quote(GIT_REVISION=\'\"$$GIT_REVISION\"\')
 	DEFINES += $$quote(GIT_HEAD=\'\"$$GIT_HEAD\"\')
-	
+
 	VER_PAT = $$GIT_REVISION
 } else {
 	message("Source not connected to git repo.")
@@ -27,4 +27,3 @@ isEmpty(VER_MAJ):isEmpty(VER_MIN) {
 
 DEFINES += $$quote(VER_MAJ=\'\"$$VER_MAJ\"\')
 DEFINES += $$quote(VER_MIN=\'\"$$VER_MIN\"\')
-

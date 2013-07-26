@@ -7,10 +7,6 @@
 # Qt Modules
 QT       -= gui
 
-# Versioning
-VER_MIN = 1
-exists($$PWD/../version.pri) : include($$PWD/../version.pri)
-
 # Project Information
 TARGET = NexusCoordinatorDaemon
 CONFIG   += console
@@ -18,6 +14,11 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+# Versioning
+VER_MIN = 1
+exists($$PWD/../version.pri) : include($$PWD/../version.pri)
+
+# Files
 SOURCES += main.cpp
 
 # Internal Includes
@@ -40,3 +41,9 @@ exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {
 	INCLUDEPATH += $$PWD/../extern/NexusConfig
 	DEPENDPATH += $$PWD/../extern/NexusConfig
 }
+
+OTHER_FILES += \
+    default.xml
+
+RESOURCES += \
+    resources.qrc

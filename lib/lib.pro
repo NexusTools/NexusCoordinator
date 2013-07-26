@@ -17,8 +17,7 @@ TEMPLATE = lib
 
 DEFINES += NEXUSCOORDINATOR_LIBRARY
 
-SOURCES += nexuscoordinator.cpp \
-    coordinatorservice.cpp
+SOURCES += nexuscoordinator.cpp
 
 HEADERS += nexuscoordinator.h\
         nexuscoordinator_global.h \
