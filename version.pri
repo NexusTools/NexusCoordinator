@@ -18,8 +18,12 @@ greaterThan(BRANCH_COUNT, 1) {
 	message("Debugging tools will not be compiled for this build...")
 }
 
-isEmpty(VER_MAJ) : VER_MAJ = 0
-isEmpty(VER_MIN) : VER_MIN = 0
+isEmpty(VER_MAJ):isEmpty(VER_MIN) {
+	message(_PRO_FILE_PWD_)
+} else {
+	isEmpty(VER_MAJ): VER_MAJ = 0
+	isEmpty(VER_MIN): VER_MIN = 0
+}
 
 DEFINES += $$quote(VER_MAJ=\'\"$$VER_MAJ\"\')
 DEFINES += $$quote(VER_MIN=\'\"$$VER_MIN\"\')
