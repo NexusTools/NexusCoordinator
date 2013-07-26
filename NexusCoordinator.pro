@@ -1,8 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    lib \
+SUBDIRS +=   extern \
+	lib \
     daemon \
     console \
-    gui
-
+	gui

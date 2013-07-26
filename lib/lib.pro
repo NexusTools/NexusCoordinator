@@ -26,3 +26,10 @@ unix:!symbian {
     }
     INSTALLS += target
 }
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusComm/release/ -lNexusComm
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusComm/debug/ -lNexusComm
+else:unix: LIBS += -L$$OUT_PWD/../extern/NexusComm/ -lNexusComm
+
+INCLUDEPATH += $$PWD/../extern/NexusComm
+DEPENDPATH += $$PWD/../extern/NexusComm
