@@ -55,6 +55,13 @@ private:
                 path + '/' +
 #ifdef IDE_MODE
                 name + '/' +
+#ifdef Q_OS_WINDOWS
+#ifdef DEBUG_MODE
+                "debug" +
+#else
+                "release" +
+#endif
+#endif
 #endif
                 name + '.' + LIB_EXT));
 

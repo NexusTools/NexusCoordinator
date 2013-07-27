@@ -16,7 +16,7 @@ TARGET = NexusCoordinator
 TEMPLATE = lib
 
 DEFINES += NEXUSCOORDINATOR_LIBRARY
-CONFIG(debug, debug|release): DEFINES += IDE_MODE
+CONFIG(debug, debug|release): DEFINES += IDE_MODE DEBUG_MODE
 
 # Versioning
 VER_MIN = 1
