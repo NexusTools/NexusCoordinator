@@ -11,16 +11,18 @@ QT       -= gui
 	DEFINES += LEGACY_QT
 }
 
-# Versioning
-VER_MIN = 1
-exists($$PWD/../version.pri) : include($$PWD/../version.pri)
-
 # Project Information
 TARGET = NexusCoordinator
 TEMPLATE = lib
 
 DEFINES += NEXUSCOORDINATOR_LIBRARY
+CONFIG(debug, debug|release): DEFINES += IDE_MODE
 
+# Versioning
+VER_MIN = 1
+exists($$PWD/../version.pri) : include($$PWD/../version.pri)
+
+# Project Files
 SOURCES += nexuscoordinator.cpp
 
 HEADERS += nexuscoordinator.h\

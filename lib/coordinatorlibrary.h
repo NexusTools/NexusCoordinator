@@ -48,7 +48,15 @@ private:
     inline CoordinatorLibrary(QSharedPointer<QLibrary> lib = QSharedPointer<QLibrary>()) : _library(lib) {_createInstance = 0;_createResolved = 0;}
 
     static inline CoordinatorLibrary* create(QString name, QString type, QString path, bool exportSymbols =false) {
-        QSharedPointer<QLibrary> lib(new QLibrary(path + '/' + name + '.' + LIB_EXT));
+        QSharedPointer<QLibrary> lib(new QLibrary(
+#ifdef IDE_MODE
+                "../" +
+#endif
+                path + '/' +
+#ifdef IDE_MODE
+                name + '/' +
+#endif
+                name + '.' + LIB_EXT));
 
         if(lib->load()) {
             QString ID = QString("NexusCoordinator_%1_%2_").arg(type).arg(name);
