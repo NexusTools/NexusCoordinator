@@ -21,6 +21,7 @@ class CoordinatorLibrary
 
     typedef T* (*CreateInstance)();
     typedef QByteArray (*LibraryMetaData)();
+    typedef const char* (*LibraryAuthors)();
     typedef const char* (*LibraryVersion)();
 
     friend class NexusCoordinator;
@@ -84,10 +85,19 @@ private:
 
             LibraryVersion libVer = (LibraryVersion)lib->resolve(QString("%1Version").arg(ID).toLocal8Bit().data());
             LibraryMetaData libMeta = (LibraryMetaData)lib->resolve(QString("%1MetaData").arg(ID).toLocal8Bit().data());
+            LibraryAuthors libAuthors = (LibraryAuthors)lib->resolve(QString("%1Authors").arg(ID).toLocal8Bit().data());
 
             QString version;
             if(libVer)
                 version = libVer();
+
+            QStringList authors;
+            if(libAuthors)
+                authors = QString::fromUtf8(libAuthors()).split(',', QString::SkipEmptyParts);
+            if(authors.isEmpty())
+                authors << "Unknown";
+            else
+                qDebug() << "Authors" << authors;
 
             QVariantMap metaData;
             if(libMeta) {
@@ -122,6 +132,7 @@ private:
     QString _id;
     QString _name;
     QString _version;
+    QStringList _authors;
     bool _createResolved;
     QVariantMap _metaData;
     QVariantMap _defaults;

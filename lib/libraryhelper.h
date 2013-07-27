@@ -13,6 +13,13 @@
 #define VERSION "Unknown Version (Unknown Branch)"
 #endif
 
+#ifdef GIT_AUTHORS
+#define AUTHORS GIT_AUTHORS
+#else
+#warning "GIT_AUTHORS macro missing, please fix git support or specify manually."
+#define AUTHORS "Unknown"
+#endif
+
 #ifndef EXPORTED
 #error "EXPORTED macro required, see built-in services for reference."
 #endif
@@ -32,7 +39,11 @@
             return QByteArray(); \
     } \
     \
-	extern "C" EXPORTED const char* NexusCoordinator_##Type##_##Class##_Version() { \
+    extern "C" EXPORTED const char* NexusCoordinator_##Type##_##Class##_Authors() { \
+        return AUTHORS; \
+    } \
+    \
+    extern "C" EXPORTED const char* NexusCoordinator_##Type##_##Class##_Version() { \
         return VERSION; \
     }
 
