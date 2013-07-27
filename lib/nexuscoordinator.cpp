@@ -47,10 +47,12 @@ bool NexusCoordinator::loadConfig(QVariantMap data) {
                 if(serviceProvider) {
                     service = serviceProvider->newInstance();
                     if(service) {
+                        service->_name = name;
+                        service->_provider = serviceProvider;
+                        service->setConfig(serviceConfig);
+
                         _services.insert(name, service);
                         takenNames << name;
-
-                        qDebug() << "Version" << serviceProvider->version();
                     } else
                         throw "newInstance failed";
                 } else

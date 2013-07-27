@@ -22,7 +22,7 @@ public:
     bool loadConfig(QVariantMap);
 
     inline CoordinatorService* service(QString name) const{return _services.value(name);}
-    inline QStringList services() const{return _services.keys();}
+    inline QList<CoordinatorService*> services() const{return _services.values();}
 
 private:
     inline NexusCoordinator() {}

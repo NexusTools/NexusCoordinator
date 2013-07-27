@@ -4,6 +4,7 @@
 
 #include <signal.h>
 
+#include <coordinatorservice.h>
 #include <nexuscoordinator.h>
 #include <nexusconfig.h>
 
@@ -68,6 +69,9 @@ int main(int argc, char *argv[])
     qDebug() << "Starting services...";
     if(NexusCoordinator::instance()->services().isEmpty())
         qFatal("No services loaded, please fix your configuration");
+
+    foreach(CoordinatorService* srv, NexusCoordinator::instance()->services())
+        srv->start();
 
     return a.exec();
 }

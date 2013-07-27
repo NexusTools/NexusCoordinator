@@ -5,7 +5,16 @@
 	</Modules>
 	<DefaultConfig>
 		<Hosts>
-			<Host root="/var/www" />
+			<Host name="Default" root="/var/www" />
 		</Hosts>
 	</DefaultConfig>
+	<ControlInterface>
+		<TabbedWidget>
+			<Tabs>
+				<Tab name="Statistics" />
+				<Tab name="Virtual Hosts" />
+				<Tab name="Statistics" />
+			</Tabs>
+		</TabbedWidget>
+	</ControlInterface>
 </NexusCoordinator>

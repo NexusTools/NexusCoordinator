@@ -2,6 +2,7 @@
 #define COORDINATORSERVICE_H
 
 #include <QVariantMap>
+#include <QDebug>
 
 #include "coordinatorlibrarydef.h"
 
@@ -15,12 +16,15 @@ public slots:
         if(_running)
             return true;
 
+        qDebug() << "Starting" << name();
         try {
             startImpl();
             _running = true;
         } catch(const char* err) {
+            qWarning() << err;
             _error = err;
         } catch(QString err) {
+            qWarning() << err.toLocal8Bit().data();
             _error = err;
         } catch(...) {}
 
@@ -30,12 +34,15 @@ public slots:
         if(!_running)
             return true;
 
+        qDebug() << "Stopping" << name();
         try {
             stopImpl();
             _running = false;
         } catch(const char* err) {
+            qWarning() << err;
             _error = err;
         } catch(QString err) {
+            qWarning() << err.toLocal8Bit().data();
             _error = err;
         } catch(...) {}
 
@@ -48,6 +55,8 @@ public slots:
     inline QVariant config(QString name) {
         return config<QVariant>(name);
     }
+
+    inline QString name() const{return _name;}
 
 protected:
     inline CoordinatorService() {_running=false;}
@@ -66,7 +75,7 @@ protected:
         return def;
     }
 
-    virtual void reloadConfigImpl() =0;
+    inline virtual void reloadConfigImpl() {}
     virtual void startImpl() =0;
     virtual void stopImpl() =0;
 

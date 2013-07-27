@@ -4,17 +4,19 @@
 #include "global.h"
 
 #include <coordinatorservice.h>
+#include <commservergroup.h>
 
 class EXPORTED HTTPServer : CoordinatorService
 {
-    
 public:
     HTTPServer();
 
 protected:
-    inline void reloadConfigImpl() {}
-    inline void startImpl() {}
-    inline void stopImpl() {}
+    void startImpl();
+    void stopImpl();
+
+private:
+    CommServerGroup listenGroup;
 
 };
 

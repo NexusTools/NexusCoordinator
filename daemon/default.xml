@@ -8,12 +8,16 @@
 		</Service>
 		<Service class="HTTPServer">
 			<Hosts>
-				<Host port="2034" processor="HTTPServerManagment" />
+				<Host name="Default" root="/var/www" />
+				<Host name="ControlPanel" port="2034" processor="HTTPServerManagment" />
 			</Hosts>
 		</Service>
+		<Service class="MailServer" />
+		<Service class="DNSServer" />
 	</Services>
 	<Modules>
-		<Module class="ServerManagment" />
-		<Module class="HTTPServerManagment" />
+		<Module class="SoftwareManagment" />
+		<Module class="DebianPackageManagement" />
+		<Module class="PAMUserAuthentication" />
 	</Modules>
 </NexusCoordinator>
