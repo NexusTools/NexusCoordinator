@@ -12,7 +12,6 @@ TEMPLATE = lib
 DEFINES += EXPORT_DECL
 
 # Versioning
-VER_MIN = 1
 exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
 
 # Project Files

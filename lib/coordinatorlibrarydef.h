@@ -3,14 +3,9 @@
 
 #include <QSharedPointer>
 
-template <class T> class CoordinatorLibrary;
-class CoordinatorService;
-class CoordinatorModule;
+class CoordinatorLibrary;
 
-typedef CoordinatorLibrary<CoordinatorService> CoordinatorServiceLib;
-typedef QSharedPointer<CoordinatorServiceLib> CoordinatorServiceLibRef;
-
-typedef CoordinatorLibrary<CoordinatorModule> CoordinatorModuleLib;
-typedef QSharedPointer<CoordinatorModuleLib> CoordinatorModuleLibRef;
+typedef QSharedPointer<CoordinatorLibrary> CoordinatorLibraryRef;
+typedef QWeakPointer<CoordinatorLibrary> CoordinatorLibraryPointer;
 
 #endif // COORDINATORLIBRARYDEF_H

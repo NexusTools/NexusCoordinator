@@ -1,8 +1,11 @@
 TEMPLATE = subdirs
 
-SUBDIRS +=   extern \
-	lib \
+!CONFIG(NOEXTERN): SUBDIRS = extern
+
+SUBDIRS +=  lib \
+	modules \
 	services \
-    daemon \
-	console \
-	gui
+	daemon
+
+!CONFIG(NOCONSOLE):packagesExist(ncurses): SUBDIRS += console
+!CONFIG(NOGUI):packagesExist(QtGui): SUBDIRS += gui

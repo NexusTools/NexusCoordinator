@@ -5,6 +5,7 @@
 
 #include <coordinatorservice.h>
 #include <commservergroup.h>
+#include "httpprocessor.h"
 
 class EXPORTED HTTPServer : CoordinatorService
 {
@@ -17,6 +18,7 @@ protected:
 
 private:
     CommServerGroup listenGroup;
+    HTTPProcessor processor;
 
 };
 

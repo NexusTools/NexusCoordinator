@@ -1,0 +1,12 @@
+#ifndef HTTPCORE_GLOBAL_H
+#define HTTPCORE_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(HTTPCORE_LIBRARY)
+#  define HTTPCORESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define HTTPCORESHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // HTTPCORE_GLOBAL_H

@@ -91,7 +91,7 @@ private:
         reloadConfigImpl();
     }
 
-    CoordinatorServiceLibRef _provider;
+    CoordinatorLibraryRef _provider;
 };
 
 #endif // COORDINATORSERVICE_H

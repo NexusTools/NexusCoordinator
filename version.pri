@@ -5,7 +5,7 @@ unix {
             GIT_HEAD = $$system(git rev-parse HEAD)
             GIT_BRANCH = $$system(git branch | cut -c 3-)
             GIT_REVISION = $$system(git rev-list HEAD | wc -l)
-			GIT_AUTHORS = $$system("git log --format='%aN<%aE>' | sort -u | sed ':a;N;$!ba;s/\n/,/g' -")
+			GIT_AUTHORS = $$system("git log --format='%aN<%aE>' | sort -u | sed ':a;N;$!ba;s/\\n/,/g' -")
 			message("$$GIT_BRANCH $$GIT_HEAD")
 			message("Revision $$GIT_REVISION")
 			!isEmpty(GIT_AUTHORS) {

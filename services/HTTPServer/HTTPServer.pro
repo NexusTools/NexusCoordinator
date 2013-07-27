@@ -47,3 +47,13 @@ exists($$PWD/../../extern/NexusComm/NexusComm.pro) {
 	INCLUDEPATH += $$PWD/../../extern/NexusComm
 	DEPENDPATH += $$PWD/../../extern/NexusComm
 }
+
+exists($$PWD/../../modules/HTTPCore/HTTPCore.pro) {
+	# HTTP Transports and Processors
+	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../modules/HTTPCore/release/ -lHTTPCore0
+	else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../modules/HTTPCore/debug/ -lHTTPCore0
+	else:unix: LIBS += -L$$OUT_PWD/../../modules/HTTPCore/ -lHTTPCore
+
+	INCLUDEPATH += $$PWD/../../modules/HTTPCore
+	DEPENDPATH += $$PWD/../../modules/HTTPCore
+}
