@@ -4,6 +4,7 @@
 #include <QLibrary>
 #include <QVariantMap>
 #include <QFileInfo>
+#include <QDebug>
 #include <QDir>
 
 #include "coordinatorlibrarydef.h"
@@ -61,9 +62,9 @@ private:
 
     static inline CoordinatorLibrary* create(QString name, QString type, QString path, bool exportSymbols =false) {
 #ifdef IDE_MODE
-		static QString basePath = QFileInfo(QDir::currentPath()).dir().path();
+        static QString basePath = QFileInfo(QDir::currentPath()).dir().path();
 #endif
-        QSharedPointer<QLibrary> lib(new QLibrary(
+        QString libPath =
 #ifdef IDE_MODE
 				basePath + '/' +
 #endif
@@ -76,6 +77,8 @@ private:
 #else
 				"release/" +
 #endif
+#else
+                "lib" +
 #endif
 #endif
 				name +
@@ -84,16 +87,52 @@ private:
 				"0" +
 #endif
 #endif
-				'.' + LIB_EXT));
+                '.' + LIB_EXT;
 
+        QVariantMap metaData;
+        {
+            qDebug() << libPath;
+            QFile f(libPath);
+            if(f.open(QFile::ReadOnly)) {
+                qDebug() << "Manually parsing binary file...";
+
+                int pos;
+                QByteArray buffer;
+                while(!f.atEnd()) {
+                    if(buffer.length() >= 200)
+                        buffer = buffer.mid(100);
+                    buffer += f.read(100);
+                    if((pos = buffer.indexOf("<NexusCoordinator>")) > -1) {
+                        bool ok;
+                        quint16 size;
+                        size = buffer.mid(pos-4, 4).toHex().toInt(&ok, 16);
+                        if(!ok)
+                            throw "MetaData size corrupt.";
+
+                        buffer = buffer.mid(pos);
+                        size -= buffer.length();
+                        while(size > 0) {
+                            if(f.atEnd())
+                                throw "EOF while parsing metadata.";
+
+                            QByteArray newData = f.read(size);
+                            buffer += newData;
+                            size -= newData.length();
+                        }
+
+                        metaData = NexusConfig::parse(buffer, NexusConfig::XmlFormat).toMap();
+                        break;
+                    }
+                }
+            } else
+                throw "Could not open binary...";
+        }
+
+        QSharedPointer<QLibrary> lib(new QLibrary(libPath));
         if(lib->load()) {
             QString ID = QString("NexusCoordinator_%1_%2_").arg(type).arg(name);
-            CreateInstance createInstance = (CreateInstance)lib->resolve(QString("%1CreateInstance").arg(ID).toLocal8Bit().data());
-            if(!createInstance)
-                throw "Missing CreateInstance entrypoint";
 
             LibraryVersion libVer = (LibraryVersion)lib->resolve(QString("%1Version").arg(ID).toLocal8Bit().data());
-            LibraryMetaData libMeta = (LibraryMetaData)lib->resolve(QString("%1MetaData").arg(ID).toLocal8Bit().data());
             LibraryAuthors libAuthors = (LibraryAuthors)lib->resolve(QString("%1Authors").arg(ID).toLocal8Bit().data());
 
             QString version;
@@ -107,15 +146,6 @@ private:
                 authors << "Unknown";
             else
                 qDebug() << "Authors" << authors;
-
-            QVariantMap metaData;
-            if(libMeta) {
-                QByteArray metaBytes = libMeta();
-                if(!metaBytes.isEmpty()) {
-                    metaData = NexusConfig::parse(metaBytes, NexusConfig::XmlFormat).toMap();
-                    qDebug() << "MetaData" << metaData;
-                }
-            }
 
             if(exportSymbols) {
                 lib->unload();
