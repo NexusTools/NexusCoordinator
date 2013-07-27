@@ -15,7 +15,6 @@ QT       -= gui
 TARGET = NexusCoordinator
 TEMPLATE = lib
 
-DEFINES += NEXUSCOORDINATOR_LIBRARY
 CONFIG(debug, debug|release): DEFINES += IDE_MODE DEBUG_MODE
 
 # Versioning
@@ -33,8 +32,8 @@ HEADERS += nexuscoordinator.h\
 # Internal libraries
 exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {
 	# Configuration Library
-	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/release/ -lNexusConfig
-	else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/debug/ -lNexusConfig
+        win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/release/ -lNexusConfig0
+        else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/debug/ -lNexusConfig0
 	else:unix: LIBS += -L$$OUT_PWD/../extern/NexusConfig/ -lNexusConfig
 
 	INCLUDEPATH += $$PWD/../extern/NexusConfig

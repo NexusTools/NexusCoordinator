@@ -56,9 +56,13 @@ bool NexusCoordinator::loadConfig(QVariantMap data) {
                 } else
                     throw "Failed to create instance of service library";
             }
-        } catch(const char* reason) {
-            qWarning() << "Failed to load:" << reason;
-        }
+		} catch(const char* reason) {
+			qWarning() << "Failed to load:" << reason;
+		} catch(QString reason) {
+			qWarning() << "Failed to load:" << reason.toLocal8Bit().data();
+		} catch(...) {
+			qWarning() << "Unknown exception caught while loading...";
+		}
     }
 
     return true;

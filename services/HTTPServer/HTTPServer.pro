@@ -9,7 +9,7 @@ QT       -= gui
 TARGET = HTTPServer
 TEMPLATE = lib
 
-DEFINES += HTTPSERVER_LIBRARY
+DEFINES += EXPORT_DECL
 
 # Versioning
 VER_MIN = 1
@@ -18,8 +18,8 @@ exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
 # Project Files
 SOURCES += httpserver.cpp
 
-HEADERS += httpserver.h\
-		httpserver_global.h
+HEADERS += httpserver.h \
+    global.h
 
 OTHER_FILES += \
 	library.xml
@@ -30,8 +30,8 @@ RESOURCES += \
 # Internal Libraries
 exists($$PWD/../../lib/lib.pro) {
 	# Main Library
-	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../lib/release/ -lNexusCoordinator
-	else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../lib/debug/ -lNexusCoordinator
+        win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../lib/release/ -lNexusCoordinator0
+        else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../lib/debug/ -lNexusCoordinator0
 	else:unix: LIBS += -L$$OUT_PWD/../../lib/ -lNexusCoordinator
 
 	INCLUDEPATH += $$PWD/../../lib
@@ -40,8 +40,8 @@ exists($$PWD/../../lib/lib.pro) {
 
 exists($$PWD/../../extern/NexusComm/NexusComm.pro) {
 	# Communication Library
-	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/release/ -lNexusComm
-	else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/debug/ -lNexusComm
+        win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/release/ -lNexusComm0
+        else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/debug/ -lNexusComm0
 	else:unix: LIBS += -L$$OUT_PWD/../../extern/NexusComm/ -lNexusComm
 
 	INCLUDEPATH += $$PWD/../../extern/NexusComm

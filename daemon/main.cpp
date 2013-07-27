@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QtGlobal>
 #include <QDebug>
 
 #include <signal.h>
@@ -10,6 +11,7 @@ inline void reloadConfig() {
     NexusCoordinator::init(NexusConfig::parseFile("config.xml", NexusConfig::XmlFormat).toMap());
 }
 
+#ifdef Q_OS_LINUX
 void handleSignal(int signum) {
     qDebug() << "Signal received" << signum;
 
@@ -26,6 +28,7 @@ void connectSignal (int __sig, __sighandler_t __handler) {
     if(signal(__sig, __handler) == SIG_ERR)
         qWarning() << "Failed to connect signal";
 }
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -52,6 +55,7 @@ int main(int argc, char *argv[])
         NexusCoordinator::init(NexusConfig::parseFile(":/default.xml", NexusConfig::XmlFormat).toMap());
     }
 
+#ifdef Q_OS_UNIX
     qDebug() << "Connecting signals...";
     connectSignal(SIGHUP, handleSignal);
     connectSignal(SIGQUIT, handleSignal);
@@ -59,6 +63,7 @@ int main(int argc, char *argv[])
     connectSignal(SIGABRT, handleSignal);
     connectSignal(SIGTRAP, handleSignal);
     connectSignal(SIGTERM, handleSignal);
+#endif // TODO: Windows error handling
 
     qDebug() << "Starting services...";
     if(NexusCoordinator::instance()->services().isEmpty())

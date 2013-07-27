@@ -1,9 +1,9 @@
 #ifndef CONTROLSERVER_H
 #define CONTROLSERVER_H
 
-#include "controlserver_global.h"
+#include "global.h"
 
-class CONTROLSERVERSHARED_EXPORT ControlServer
+class EXPORTED ControlServer
 {
     
 public:

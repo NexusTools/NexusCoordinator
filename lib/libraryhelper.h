@@ -13,13 +13,17 @@
 #define VERSION "Unknown Version (Unknown Branch)"
 #endif
 
+#ifndef EXPORTED
+#error "EXPORTED macro required, see built-in services for reference."
+#endif
+
 
 #define DeclareCoordinatorLibrary(Class, Type) \
-    extern "C" Class* NexusCoordinator_##Type##_##Class##_CreateInstance() { \
-        return new Class();\
+	extern "C" EXPORTED Class* NexusCoordinator_##Type##_##Class##_CreateInstance() { \
+		return new Class(); \
     } \
     \
-    extern "C" QByteArray NexusCoordinator_##Type##_##Class##_MetaData() { \
+	extern "C" EXPORTED QByteArray NexusCoordinator_##Type##_##Class##_MetaData() { \
         QFile file(":/" #Type "s/" #Class "/library.xml"); \
         qDebug() << file.fileName(); \
         if(file.open(QFile::ReadOnly)) { \
@@ -28,7 +32,7 @@
             return QByteArray(); \
     } \
     \
-    extern "C" const char* NexusCoordinator_##Type##_##Class##_Version() { \
+	extern "C" EXPORTED const char* NexusCoordinator_##Type##_##Class##_Version() { \
         return VERSION; \
     }
 

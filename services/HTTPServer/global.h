@@ -3,10 +3,10 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(HTTPSERVER_LIBRARY)
-#  define HTTPSERVERSHARED_EXPORT Q_DECL_EXPORT
+#ifdef EXPORT_DECL
+#  define EXPORTED Q_DECL_EXPORT
 #else
-#  define HTTPSERVERSHARED_EXPORT Q_DECL_IMPORT
+#  define EXPORTED Q_DECL_IMPORT
 #endif
 
 #endif // HTTPSERVER_GLOBAL_H

@@ -4,6 +4,8 @@
 #include <QLibrary>
 #include <QVariantMap>
 #include <QSharedPointer>
+#include <QFileInfo>
+#include <QDir>
 
 #include <nexusconfig.h>
 
@@ -48,22 +50,31 @@ private:
     inline CoordinatorLibrary(QSharedPointer<QLibrary> lib = QSharedPointer<QLibrary>()) : _library(lib) {_createInstance = 0;_createResolved = 0;}
 
     static inline CoordinatorLibrary* create(QString name, QString type, QString path, bool exportSymbols =false) {
+#ifdef IDE_MODE
+		static QString basePath = QFileInfo(QDir::currentPath()).dir().path();
+#endif
         QSharedPointer<QLibrary> lib(new QLibrary(
 #ifdef IDE_MODE
-                "../" +
+				basePath + '/' +
 #endif
                 path + '/' +
 #ifdef IDE_MODE
                 name + '/' +
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 #ifdef DEBUG_MODE
-                "debug" +
+				"debug/" +
 #else
-                "release" +
+				"release/" +
 #endif
 #endif
 #endif
-                name + '.' + LIB_EXT));
+				name +
+#ifdef IDE_MODE
+#ifdef Q_OS_WIN
+				"0" +
+#endif
+#endif
+				'.' + LIB_EXT));
 
         if(lib->load()) {
             QString ID = QString("NexusCoordinator_%1_%2_").arg(type).arg(name);
@@ -91,7 +102,7 @@ private:
                 lib->unload();
                 lib->setLoadHints(QLibrary::ResolveAllSymbolsHint | QLibrary::ExportExternalSymbolsHint);
                 if(!lib->load())
-                    throw lib->errorString().toLocal8Bit().data();
+					throw lib->errorString();
             }
 
             CoordinatorLibrary* library = new CoordinatorLibrary(lib);
@@ -104,7 +115,7 @@ private:
 
             return library;
         } else
-            throw lib->errorString().toLocal8Bit().data();
+			throw lib->errorString();
     }
 
 

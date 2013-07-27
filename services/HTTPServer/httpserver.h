@@ -1,9 +1,9 @@
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 
-#include "httpserver_global.h"
+#include "global.h"
 
-class HTTPSERVERSHARED_EXPORT HTTPServer
+class EXPORTED HTTPServer
 {
     
 public:
