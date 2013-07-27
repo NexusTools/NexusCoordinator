@@ -1,0 +1,12 @@
+<NexusCoordinator>
+	<Description>Exposes the internal control APIs for each service to remote clients using modular protocols.</Description>
+	<Modules>
+		<Module class="ServerManagment" />
+	</Modules>
+	<DefaultConfig>
+		<Protocols>
+			<Protocol class="TelnetController" />
+			<Protocol class="LocalSocketController" />
+		</Protocols>
+	</DefaultConfig>
+</NexusCoordinator>

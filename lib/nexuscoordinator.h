@@ -1,19 +1,35 @@
 #ifndef NEXUSCOORDINATOR_H
 #define NEXUSCOORDINATOR_H
 
-#include "nexuscoordinator_global.h"
+#include <QSharedPointer>
+#include <QVariantMap>
+#include <QStringList>
 
-#include <QVariant>
+#include "coordinatorlibrary.h"
 
-class NEXUSCOORDINATORSHARED_EXPORT NexusCoordinator
+class NexusCoordinator
 {
-    
 public:
-    NexusCoordinator();
+    static inline NexusCoordinator* instance() {return _instance;}
+
+    static inline void init(QVariantMap config =QVariantMap()) {
+        if(!_instance)
+            _instance = new NexusCoordinator();
+        if(!config.isEmpty())
+            _instance->loadConfig(config);
+    }
+
     bool loadConfig(QVariantMap);
 
+    inline CoordinatorService* service(QString name) const{return _services.value(name);}
+    inline QStringList services() const{return _services.keys();}
+
 private:
-    QVariantMap services;
+    inline NexusCoordinator() {}
+
+    static NexusCoordinator* _instance;
+    QHash<QString, CoordinatorService*> _services;
+    QHash<QString, CoordinatorServiceLibRef> _serviceLibraries;
 };
 
 #endif // NEXUSCOORDINATOR_H

@@ -7,6 +7,10 @@
 # Qt Modules
 QT       -= gui
 
+!greaterThan(QT_MAJOR_VERSION, 4) {
+	DEFINES += LEGACY_QT
+}
+
 # Versioning
 VER_MIN = 1
 exists($$PWD/../version.pri) : include($$PWD/../version.pri)
@@ -20,5 +24,16 @@ DEFINES += NEXUSCOORDINATOR_LIBRARY
 SOURCES += nexuscoordinator.cpp
 
 HEADERS += nexuscoordinator.h\
-        nexuscoordinator_global.h \
-    coordinatorservice.h
+    coordinatorservice.h \
+    coordinatorlibrary.h \
+    libraryhelper.h
+
+exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {
+	# Configuration Library
+	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/release/ -lNexusConfig
+	else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/debug/ -lNexusConfig
+	else:unix: LIBS += -L$$OUT_PWD/../extern/NexusConfig/ -lNexusConfig
+
+	INCLUDEPATH += $$PWD/../extern/NexusConfig
+	DEPENDPATH += $$PWD/../extern/NexusConfig
+}

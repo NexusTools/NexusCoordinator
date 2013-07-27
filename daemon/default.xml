@@ -4,11 +4,16 @@
 			<Protocols>
 				<Protocol class="TelnetController" />
 				<Protocol class="LocalSocketController" />
-				<Protocol class="HTTPController" />
 			</Protocols>
+		</Service>
+		<Service class="HTTPServer">
+			<Hosts>
+				<Host port="2034" processor="HTTPServerManagment" />
+			</Hosts>
 		</Service>
 	</Services>
 	<Modules>
 		<Module class="ServerManagment" />
+		<Module class="HTTPServerManagment" />
 	</Modules>
 </NexusCoordinator>

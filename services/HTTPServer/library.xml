@@ -1,0 +1,11 @@
+<NexusCoordinator>
+	<Description>Provides an easy to use modular HTTP server.</Description>
+	<Modules>
+		<Module class="HTTPCore" />
+	</Modules>
+	<DefaultConfig>
+		<Hosts>
+			<Host root="/var/www" />
+		</Hosts>
+	</DefaultConfig>
+</NexusCoordinator>

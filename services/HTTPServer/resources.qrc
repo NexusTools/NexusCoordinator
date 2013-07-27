@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Services/HTTPServer">
+        <file>library.xml</file>
+    </qresource>
+</RCC>

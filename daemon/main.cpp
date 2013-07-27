@@ -6,10 +6,8 @@
 #include <nexuscoordinator.h>
 #include <nexusconfig.h>
 
-NexusCoordinator coordinator;
-
 inline void reloadConfig() {
-    coordinator.loadConfig(NexusConfig::parseFile("config.xml", NexusConfig::XmlFormat).toMap());
+    NexusCoordinator::init(NexusConfig::parseFile("config.xml", NexusConfig::XmlFormat).toMap());
 }
 
 void handleSignal(int signum) {
@@ -51,7 +49,7 @@ int main(int argc, char *argv[])
     } catch(const char* err) {
         qWarning() << err;
         qDebug() << "Using internal default configuration instead.";
-        coordinator.loadConfig(NexusConfig::parseFile(":/default.xml", NexusConfig::XmlFormat).toMap());
+        NexusCoordinator::init(NexusConfig::parseFile(":/default.xml", NexusConfig::XmlFormat).toMap());
     }
 
     qDebug() << "Connecting signals...";
@@ -59,8 +57,12 @@ int main(int argc, char *argv[])
     connectSignal(SIGQUIT, handleSignal);
     connectSignal(SIGINT, handleSignal);
     connectSignal(SIGABRT, handleSignal);
-    connectSignal(SIGKILL, handleSignal);
+    connectSignal(SIGTRAP, handleSignal);
+    connectSignal(SIGTERM, handleSignal);
 
     qDebug() << "Starting services...";
+    if(NexusCoordinator::instance()->services().isEmpty())
+        qFatal("No services loaded, please fix your configuration");
+
     return a.exec();
 }

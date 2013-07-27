@@ -11,19 +11,15 @@ TEMPLATE = lib
 
 DEFINES += HTTPSERVER_LIBRARY
 
+# Versioning
+VER_MIN = 1
+exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
+
+# Files
 SOURCES += httpserver.cpp
 
 HEADERS += httpserver.h\
-        httpserver_global.h
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+		httpserver_global.h
 
 exists($$PWD/../../lib/lib.pro) {
 	# Main Library
@@ -44,3 +40,9 @@ exists($$PWD/../../extern/NexusComm/NexusComm.pro) {
 	INCLUDEPATH += $$PWD/../../extern/NexusComm
 	DEPENDPATH += $$PWD/../../extern/NexusComm
 }
+
+OTHER_FILES += \
+    library.xml
+
+RESOURCES += \
+    resources.qrc

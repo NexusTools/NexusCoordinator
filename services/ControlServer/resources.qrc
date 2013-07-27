@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Services/ControlServer">
+        <file>library.xml</file>
+    </qresource>
+</RCC>
