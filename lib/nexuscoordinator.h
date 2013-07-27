@@ -7,8 +7,9 @@
 
 #include "coordinatorlibrary.h"
 
-class NexusCoordinator
+class NexusCoordinator : QObject
 {
+    Q_OBJECT
 public:
     static inline NexusCoordinator* instance() {return _instance;}
 

@@ -1,4 +1,4 @@
-<NexusCoordinator>
+<CoordinatorLibrary>
 	<Description>Exposes the internal control APIs for each service to remote clients using modular protocols.</Description>
 	<Modules>
 		<Module class="ServerManagment" />
@@ -9,4 +9,4 @@
 			<Protocol class="LocalSocketController" />
 		</Protocols>
 	</DefaultConfig>
-</NexusCoordinator>
+</CoordinatorLibrary>

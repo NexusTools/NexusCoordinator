@@ -1,4 +1,4 @@
-<NexusCoordinator>
+<CoordinatorLibrary>
 	<Description>Provides an easy to use modular HTTP server.</Description>
 	<Modules>
 		<Module class="HTTPCore" />
@@ -17,4 +17,4 @@
 			</Tabs>
 		</TabbedWidget>
 	</ControlInterface>
-</NexusCoordinator>
+</CoordinatorLibrary>

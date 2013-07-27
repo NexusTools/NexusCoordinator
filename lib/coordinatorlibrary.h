@@ -94,15 +94,13 @@ private:
             qDebug() << libPath;
             QFile f(libPath);
             if(f.open(QFile::ReadOnly)) {
-                qDebug() << "Manually parsing binary file...";
-
                 int pos;
                 QByteArray buffer;
                 while(!f.atEnd()) {
                     if(buffer.length() >= 200)
                         buffer = buffer.mid(100);
                     buffer += f.read(100);
-                    if((pos = buffer.indexOf("<NexusCoordinator>")) > -1) {
+                    if((pos = buffer.indexOf("<CoordinatorLibrary>")) > -1) {
                         bool ok;
                         quint16 size;
                         size = buffer.mid(pos-4, 4).toHex().toInt(&ok, 16);
@@ -120,7 +118,7 @@ private:
                             size -= newData.length();
                         }
 
-                        metaData = NexusConfig::parse(buffer, NexusConfig::XmlFormat).toMap();
+                        metaData = NexusConfig::parse(buffer, NexusConfig::XmlFormat, "CoordinatorLibrary").toMap();
                         break;
                     }
                 }
