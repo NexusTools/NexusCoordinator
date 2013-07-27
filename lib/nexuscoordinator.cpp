@@ -67,3 +67,7 @@ bool NexusCoordinator::loadConfig(QVariantMap data) {
 
     return true;
 }
+
+QVariant CoordinatorService::defaultConfig(QString key) {
+    return _provider->defaultConfig().value(key);
+}

@@ -3,7 +3,7 @@
 
 #include <QVariantMap>
 
-#include "coordinatorlibrary.h"
+#include "coordinatorlibrarydef.h"
 
 class CoordinatorService : public QObject
 {
@@ -50,22 +50,21 @@ public slots:
     }
 
 protected:
+    inline CoordinatorService() {_running=false;}
+
     template<typename T>
     inline T config(QString name, T def =T()) {
         QVariant val = _config.value(name);
         if(val.canConvert<T>())
             return val.value<T>();
         if(!_provider.isNull()) {
-            val = _provider->defaultConfig().value(name);
+            val = defaultConfig(name);
             if(val.canConvert<T>())
                 return val.value<T>();
         }
 
         return def;
     }
-
-protected:
-    inline CoordinatorService() {_running=false;}
 
     virtual void reloadConfigImpl() =0;
     virtual void startImpl() =0;
@@ -77,6 +76,7 @@ private:
     QString _error;
     QVariantMap _config;
 
+    QVariant defaultConfig(QString);
     inline void setConfig(QVariantMap config) {
         _config = config;
         reloadConfigImpl();

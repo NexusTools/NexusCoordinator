@@ -3,11 +3,17 @@
 
 #include "global.h"
 
-class EXPORTED ControlServer
+#include "coordinatorservice.h"
+
+class EXPORTED ControlServer : CoordinatorService
 {
-    
 public:
     ControlServer();
+
+protected:
+    inline void reloadConfigImpl() {}
+    inline void startImpl() {}
+    inline void stopImpl() {}
 };
 
 #endif // CONTROLSERVER_H

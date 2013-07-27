@@ -3,10 +3,10 @@
 
 #include <QLibrary>
 #include <QVariantMap>
-#include <QSharedPointer>
 #include <QFileInfo>
 #include <QDir>
 
+#include "coordinatorlibrarydef.h"
 #include <nexusconfig.h>
 
 #ifdef Q_OS_UNIX
@@ -19,7 +19,7 @@ template <class T>
 class CoordinatorLibrary
 {
 
-    typedef T* (*CreateInstance)();
+    typedef QObject* (*CreateInstance)();
     typedef QByteArray (*LibraryMetaData)();
     typedef const char* (*LibraryAuthors)();
     typedef const char* (*LibraryVersion)();
@@ -36,7 +36,16 @@ public:
             _createResolved = true;
         }
 
-        return _createInstance ? _createInstance() : 0;
+        QObject* obj = _createInstance ? _createInstance() : 0;
+        if(obj) {
+            T* dObj = qobject_cast<T*>(obj);
+            if(dObj)
+                return dObj;
+            obj->deleteLater();
+            throw "Created object was not of correct type.";
+        }
+
+        throw "Failed to create instance.";
     }
 
     inline QVariantMap metaData() const{
@@ -139,14 +148,5 @@ private:
     CreateInstance _createInstance;
     QSharedPointer<QLibrary> _library;
 };
-
-class CoordinatorService;
-class CoordinatorModule;
-
-typedef CoordinatorLibrary<CoordinatorService> CoordinatorServiceLib;
-typedef QSharedPointer<CoordinatorServiceLib> CoordinatorServiceLibRef;
-
-typedef CoordinatorLibrary<CoordinatorModule> CoordinatorModuleLib;
-typedef QSharedPointer<CoordinatorModuleLib> CoordinatorModuleLibRef;
 
 #endif // COORDINATORLIBRARY_H

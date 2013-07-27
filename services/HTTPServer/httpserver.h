@@ -3,11 +3,19 @@
 
 #include "global.h"
 
-class EXPORTED HTTPServer
+#include <coordinatorservice.h>
+
+class EXPORTED HTTPServer : CoordinatorService
 {
     
 public:
     HTTPServer();
+
+protected:
+    inline void reloadConfigImpl() {}
+    inline void startImpl() {}
+    inline void stopImpl() {}
+
 };
 
 #endif // HTTPSERVER_H

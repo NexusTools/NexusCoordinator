@@ -26,8 +26,8 @@
 
 
 #define DeclareCoordinatorLibrary(Class, Type) \
-	extern "C" EXPORTED Class* NexusCoordinator_##Type##_##Class##_CreateInstance() { \
-		return new Class(); \
+    extern "C" EXPORTED Class* NexusCoordinator_##Type##_##Class##_CreateInstance() { \
+        return new Class(); \
     } \
     \
 	extern "C" EXPORTED QByteArray NexusCoordinator_##Type##_##Class##_MetaData() { \
