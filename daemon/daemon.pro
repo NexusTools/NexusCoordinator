@@ -15,11 +15,16 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 # Versioning
-VER_MIN = 1
 exists($$PWD/../version.pri) : include($$PWD/../version.pri)
 
-# Files
+# Project Files
 SOURCES += main.cpp
+
+OTHER_FILES += \
+	default.xml
+
+RESOURCES += \
+	resources.qrc
 
 # Internal Includes
 exists($$PWD/../lib/lib.pro) {
@@ -41,9 +46,3 @@ exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {
 	INCLUDEPATH += $$PWD/../extern/NexusConfig
 	DEPENDPATH += $$PWD/../extern/NexusConfig
 }
-
-OTHER_FILES += \
-    default.xml
-
-RESOURCES += \
-    resources.qrc

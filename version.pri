@@ -1,5 +1,4 @@
 BRANCH_COUNT = $$system(git branch -a | wc -l)
-message(BRANCH_COUNT)
 
 greaterThan(BRANCH_COUNT, 1) {
 	GIT_HEAD = $$system(git rev-parse HEAD)
@@ -18,12 +17,8 @@ greaterThan(BRANCH_COUNT, 1) {
 	message("Debugging tools will not be compiled for this build...")
 }
 
-isEmpty(VER_MAJ):isEmpty(VER_MIN) {
-	message(_PRO_FILE_PWD_)
-} else {
-	isEmpty(VER_MAJ): VER_MAJ = 0
-	isEmpty(VER_MIN): VER_MIN = 0
-}
+isEmpty(VER_MAJ): VER_MAJ = 0
+isEmpty(VER_MIN): VER_MIN = 1
 
 DEFINES += $$quote(VER_MAJ=\'\"$$VER_MAJ\"\')
 DEFINES += $$quote(VER_MIN=\'\"$$VER_MIN\"\')

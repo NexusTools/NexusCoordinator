@@ -15,8 +15,7 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 # Versioning
-VER_MIN = 1
 exists($$PWD/../version.pri) : include($$PWD/../version.pri)
 
-# Files
+# Project Files
 SOURCES += main.cpp

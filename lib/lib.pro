@@ -28,6 +28,7 @@ HEADERS += nexuscoordinator.h\
     coordinatorlibrary.h \
     libraryhelper.h
 
+# Internal libraries
 exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {
 	# Configuration Library
 	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/NexusConfig/release/ -lNexusConfig

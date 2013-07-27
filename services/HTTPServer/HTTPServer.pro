@@ -15,12 +15,19 @@ DEFINES += HTTPSERVER_LIBRARY
 VER_MIN = 1
 exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
 
-# Files
+# Project Files
 SOURCES += httpserver.cpp
 
 HEADERS += httpserver.h\
 		httpserver_global.h
 
+OTHER_FILES += \
+	library.xml
+
+RESOURCES += \
+	resources.qrc
+
+# Internal Libraries
 exists($$PWD/../../lib/lib.pro) {
 	# Main Library
 	win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../lib/release/ -lNexusCoordinator
@@ -40,9 +47,3 @@ exists($$PWD/../../extern/NexusComm/NexusComm.pro) {
 	INCLUDEPATH += $$PWD/../../extern/NexusComm
 	DEPENDPATH += $$PWD/../../extern/NexusComm
 }
-
-OTHER_FILES += \
-    library.xml
-
-RESOURCES += \
-    resources.qrc
