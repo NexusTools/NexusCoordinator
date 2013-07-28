@@ -70,6 +70,7 @@ CoordinatorService* NexusCoordinator::createService(QString name, QString clazz,
         if(serviceProvider) {
             service = serviceProvider->createCompatiblePlugin<CoordinatorService>();
             if(service) {
+                qDebug() << service;
                 service->_name = name;
                 service->setConfig(config);
                 _services.insert(name, service);

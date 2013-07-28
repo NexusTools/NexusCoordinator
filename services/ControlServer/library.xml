@@ -1,7 +1,7 @@
 <CoordinatorLibrary>
 	<Description>Exposes the internal control APIs for each service to remote clients using modular protocols.</Description>
 	<Modules>
-		<Module class="ServerManagment" />
+		<Module class="ModuleManagment" />
 	</Modules>
 	<DefaultConfig>
 		<Protocols>
