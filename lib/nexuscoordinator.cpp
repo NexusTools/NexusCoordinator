@@ -59,19 +59,19 @@ CoordinatorService* NexusCoordinator::createService(QString name, QString clazz,
 
     CoordinatorService* service = _services.value(name);
     if(service && (!service->provider() ||
-                   service->provider()->name() != name)) {
+                   service->provider()->name() != clazz)) {
         service->deleteLater();
         service = 0;
     }
 
     if(!service) {
-        Module::Ref serviceProvider = ModularCore::loadModule(name, "Service");
+        Module::Ref serviceProvider = ModularCore::loadModule(clazz, "Service");
 
         if(serviceProvider) {
             service = serviceProvider->createCompatiblePlugin<CoordinatorService>();
             if(service) {
+                service->_name = name;
                 service->setConfig(config);
-
                 _services.insert(name, service);
             } else
                 throw "createCompatiblePlugin failed";
