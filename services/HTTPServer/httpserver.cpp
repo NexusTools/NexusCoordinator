@@ -7,7 +7,10 @@ HTTPServer::HTTPServer()
 }
 
 void HTTPServer::startImpl() {
-    qDebug() << config<QVariantList>("Hosts");
+    foreach(QVariant value, config<QVariantList>("Hosts")) {
+        QVariantMap host = value.toMap();
+        qDebug() << host;
+    }
 }
 
 void HTTPServer::stopImpl() {

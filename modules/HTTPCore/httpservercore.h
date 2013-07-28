@@ -1,5 +1,5 @@
-#ifndef HTTPSERVER_H
-#define HTTPSERVER_H
+#ifndef HTTPSERVERCORE_H
+#define HTTPSERVERCORE_H
 
 #include <commservergroup.h>
 
@@ -13,4 +13,4 @@ public:
     
 };
 
-#endif // HTTPSERVER_H
+#endif // HTTPSERVERCORE_H

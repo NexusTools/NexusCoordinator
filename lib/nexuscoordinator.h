@@ -39,7 +39,7 @@ protected:
     Module::Ref loadModule(QVariant def);
 
     inline void moduleVerify(Module::Ref module) {
-        module->load(module->type() == "Module" ? Module::LoadFlags(Module::LooseVerify|Module::ExportSymbols) : Module::LoadFlags(Module::StrictVerify));
+        module->load(module->type() == "Module" ? Module::LoadFlags(Module::LooseVerify|Module::ExportSymbols|Module::IgnoreLibraryName) : Module::LoadFlags(Module::StrictVerify));
     }
 
     Module::List moduleMetaData(QVariantMap);
