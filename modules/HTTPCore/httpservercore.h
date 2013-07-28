@@ -3,11 +3,11 @@
 
 #include <commservergroup.h>
 
-class HTTPServer : public CommServerGroup
+class HTTPServerCore : public CommServerGroup
 {
     Q_OBJECT
 public:
-    explicit HTTPServer();
+    Q_INVOKABLE HTTPServerCore();
 
 
     

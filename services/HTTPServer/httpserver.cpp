@@ -1,6 +1,6 @@
 #include "httpserver.h"
-#include "libraryhelper.h"
 
+#include <coordinator-macros.h>
 
 HTTPServer::HTTPServer()
 {
@@ -14,4 +14,5 @@ void HTTPServer::stopImpl() {
 
 }
 
-DeclareCoordinatorLibrary(HTTPServer, Service)
+BeginModule(HTTPServer, Service)
+EndModule()

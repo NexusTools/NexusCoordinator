@@ -4,9 +4,9 @@
 #include <QVariantMap>
 #include <QDebug>
 
-#include "coordinatorlibrarydef.h"
+#include <moduleplugin.h>
 
-class CoordinatorService : public QObject
+class CoordinatorService : public ModulePlugin
 {
     Q_OBJECT
 
@@ -59,14 +59,14 @@ public slots:
     inline QString name() const{return _name;}
 
 protected:
-    inline CoordinatorService() {_running=false;}
+    inline explicit CoordinatorService() {_running=false;}
 
     template<typename T>
     inline T config(QString name, T def =T()) {
         QVariant val = _config.value(name);
         if(val.canConvert<T>())
             return val.value<T>();
-        if(!_provider.isNull()) {
+        if(provider()) {
             val = defaultConfig(name);
             if(val.canConvert<T>())
                 return val.value<T>();
@@ -88,10 +88,8 @@ private:
     QVariant defaultConfig(QString);
     inline void setConfig(QVariantMap config) {
         _config = config;
-        reloadConfigImpl();
     }
 
-    CoordinatorLibraryRef _provider;
 };
 
 #endif // COORDINATORSERVICE_H

@@ -1,9 +1,11 @@
 #include "controlserver.h"
-#include "libraryhelper.h"
+
+#include <coordinator-macros.h>
 
 
 ControlServer::ControlServer()
 {
 }
 
-DeclareCoordinatorLibrary(ControlServer, Service)
+BeginModule(ControlServer, Service)
+EndModule()

@@ -7,8 +7,9 @@
 
 class EXPORTED ControlServer : CoordinatorService
 {
+    Q_OBJECT
 public:
-    ControlServer();
+    Q_INVOKABLE ControlServer();
 
 protected:
     inline void reloadConfigImpl() {}

@@ -8,7 +8,7 @@
 class HTTPPacket : public RawCommPacket
 {
 public:
-    inline explicit HTTPPacket(QByteArray payload =QByteArray()) : RawCommPacket(payload) {}
+    Q_INVOKABLE inline explicit HTTPPacket(QByteArray payload =QByteArray()) : RawCommPacket(payload) {}
 
 private:
     uint _status;

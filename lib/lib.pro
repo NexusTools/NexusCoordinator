@@ -25,9 +25,7 @@ SOURCES += nexuscoordinator.cpp
 
 HEADERS += nexuscoordinator.h\
     coordinatorservice.h \
-    coordinatorlibrary.h \
-    libraryhelper.h \
-    coordinatorlibrarydef.h
+    coordinator-macros.h
 
 # Internal libraries
 exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {

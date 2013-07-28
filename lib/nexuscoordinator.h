@@ -1,19 +1,21 @@
 #ifndef NEXUSCOORDINATOR_H
 #define NEXUSCOORDINATOR_H
 
+#include <coordinator-macros.h>
 #include <modularcore.h>
 
 #include <QSharedPointer>
 #include <QVariantMap>
 #include <QStringList>
 
-#include "coordinatorlibrary.h"
-
 class CoordinatorService;
 
 class NexusCoordinator : public QObject, public ModularCore
 {
     Q_OBJECT
+    MODULAR_CORE
+
+    typedef QHash<QString, CoordinatorService*> RegisteredServices;
 
     friend class CoordinatorLibrary;
 public:
@@ -30,20 +32,23 @@ public:
 
     inline CoordinatorService* service(QString name) const{return _services.value(name);}
     inline QList<CoordinatorService*> services() const{return _services.values();}
+    inline void registerService(QString name, CoordinatorService*);
 
 protected:
     CoordinatorService* createService(QString name, QString clazz, QVariantMap config =QVariantMap());
-    CoordinatorLibraryRef loadModule(QString name);
-    CoordinatorLibraryRef loadModule(QVariant def);
+    Module::Ref loadModule(QVariant def);
+
+    void moduleMetaData(Module::Ref module, QVariantMap) {
+        module->load(module->type() == "Module" ? Module::LoadFlags(Module::LooseVerify|Module::ExportSymbols) : Module::LoadFlags(Module::StrictVerify));
+    }
 
 private:
-    inline NexusCoordinator() {}
+    NexusCoordinator();
 
     static NexusCoordinator* _instance;
-    QHash<QString, CoordinatorService*> _services;
-    QHash<QString, CoordinatorLibraryPointer> _serviceLibraries;
-    QHash<QString, CoordinatorLibraryPointer> _moduleLibraries;
-    QList<CoordinatorLibraryRef> _configModules;
+
+    Module::List _configModules;
+    RegisteredServices _services;
 };
 
 #endif // NEXUSCOORDINATOR_H

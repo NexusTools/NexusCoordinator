@@ -8,7 +8,7 @@
 class HTTPCORESHARED_EXPORT HTTPProcessor : CommPacketProcessor
 {
 public:
-    HTTPProcessor();
+    Q_INVOKABLE HTTPProcessor();
 
     void processData(QByteArray) {}
 

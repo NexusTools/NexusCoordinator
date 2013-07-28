@@ -46,3 +46,10 @@ exists($$PWD/../../extern/NexusComm/NexusComm.pro) {
 	INCLUDEPATH += $$PWD/../../extern/NexusComm
 	DEPENDPATH += $$PWD/../../extern/NexusComm
 }
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/ModularCore/release/ -lModularCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/ModularCore/debug/ -lModularCore
+else:unix: LIBS += -L$$OUT_PWD/../../extern/ModularCore/ -lModularCore
+
+INCLUDEPATH += $$PWD/../../extern/ModularCore
+DEPENDPATH += $$PWD/../../extern/ModularCore

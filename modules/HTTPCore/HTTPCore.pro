@@ -19,12 +19,12 @@ exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../..
 # Project Files
 SOURCES += httpprocessor.cpp \
     httppacket.cpp \
-    httpserver.cpp
+    httpservercore.cpp
 
 HEADERS += httpprocessor.h\
     httppacket.h \
 	global.h \
-    httpserver.h
+    httpservercore.h
 
 unix:!symbian {
     maemo5 {

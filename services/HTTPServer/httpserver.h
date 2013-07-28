@@ -9,8 +9,9 @@
 
 class EXPORTED HTTPServer : CoordinatorService
 {
+    Q_OBJECT
 public:
-    HTTPServer();
+    Q_INVOKABLE HTTPServer();
 
 protected:
     void startImpl();
