@@ -38,9 +38,11 @@ protected:
     CoordinatorService* createService(QString name, QString clazz, QVariantMap config =QVariantMap());
     Module::Ref loadModule(QVariant def);
 
-    void moduleMetaData(Module::Ref module, QVariantMap) {
+    inline void moduleVerify(Module::Ref module) {
         module->load(module->type() == "Module" ? Module::LoadFlags(Module::LooseVerify|Module::ExportSymbols) : Module::LoadFlags(Module::StrictVerify));
     }
+
+    Module::List moduleMetaData(QVariantMap);
 
 private:
     NexusCoordinator();

@@ -82,8 +82,14 @@ CoordinatorService* NexusCoordinator::createService(QString name, QString clazz,
     return service;
 }
 
-Module::Ref NexusCoordinator::loadModule(QVariant def) {
+Module::List NexusCoordinator::moduleMetaData(QVariantMap metaData) {
+    Module::List deps;
+    foreach(QVariant module, metaData.value("Modules").toList())
+        deps << ModularCore::loadModule(module.toMap().value("class").toString(), "Module");
+    return deps;
+}
 
+Module::Ref NexusCoordinator::loadModule(QVariant def) {
     QString clazz = def.toMap().value("class").toString();
     Module::Ref mod;
     if(!clazz.isEmpty())

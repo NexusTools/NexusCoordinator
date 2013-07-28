@@ -7,6 +7,7 @@
 
 class HTTPCORESHARED_EXPORT HTTPProcessor : CommPacketProcessor
 {
+    Q_OBJECT
 public:
     Q_INVOKABLE HTTPProcessor();
 
