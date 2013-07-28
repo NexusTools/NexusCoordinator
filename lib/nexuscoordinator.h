@@ -42,8 +42,6 @@ protected:
         module->load(module->type() == "Module" ? Module::LoadFlags(Module::LooseVerify|Module::ExportSymbols|Module::IgnoreLibraryName) : Module::LoadFlags(Module::StrictVerify));
     }
 
-    Module::List moduleMetaData(QVariantMap);
-
 private:
     NexusCoordinator();
 

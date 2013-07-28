@@ -6,8 +6,8 @@
 NexusCoordinator* NexusCoordinator::_instance = 0;
 
 NexusCoordinator::NexusCoordinator() {
-    registerType("Service", "services");
-    registerType("Module", "modules");
+    registerType("Service", "services", "Modules");
+    registerType("Module", "modules", "Modules");
 }
 
 bool NexusCoordinator::loadConfig(QVariantMap data) {
@@ -81,13 +81,6 @@ CoordinatorService* NexusCoordinator::createService(QString name, QString clazz,
     }
 
     return service;
-}
-
-Module::List NexusCoordinator::moduleMetaData(QVariantMap metaData) {
-    Module::List deps;
-    foreach(QVariant module, metaData.value("Modules").toList())
-        deps << ModularCore::loadModule(module.toMap().value("class").toString(), "Module");
-    return deps;
 }
 
 Module::Ref NexusCoordinator::loadModule(QVariant def) {
