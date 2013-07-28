@@ -12,7 +12,7 @@ TEMPLATE = lib
 DEFINES += EXPORT_DECL
 
 # Versioning
-exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
+exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../../extern/GitProjectVersionQt/version.pri)
 
 # Project Files
 SOURCES += controlserver.cpp

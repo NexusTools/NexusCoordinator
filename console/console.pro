@@ -11,11 +11,12 @@ QT       -= gui
 TARGET = NexusCoordinatorConsole
 CONFIG   += console
 CONFIG   -= app_bundle
+LIBS += -lncurses
 
 TEMPLATE = app
 
 # Versioning
-exists($$PWD/../version.pri) : include($$PWD/../version.pri)
+exists($$PWD/../extern/GitProjectVersionQt/version.pri) : include($$PWD/../extern/GitProjectVersionQt/version.pri)
 
 # Project Files
 SOURCES += main.cpp

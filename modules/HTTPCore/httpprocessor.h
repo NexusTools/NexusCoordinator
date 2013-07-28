@@ -1,13 +1,17 @@
 #ifndef HTTPPROCESSOR_H
 #define HTTPPROCESSOR_H
 
-#include "httpcore_global.h"
+#include "global.h"
 
-class HTTPCORESHARED_EXPORT HTTPProcessor
+#include <commpacketprocessor.h>
+
+class HTTPCORESHARED_EXPORT HTTPProcessor : CommPacketProcessor
 {
-    
 public:
     HTTPProcessor();
+
+    void processData(QByteArray) {}
+
 };
 
 #endif // HTTPPROCESSOR_H

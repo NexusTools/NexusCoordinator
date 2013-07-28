@@ -72,7 +72,7 @@ private:
     QVariantMap _defaults;
     CreateInstance _createInstance;
     QSharedPointer<QLibrary> _library;
-    QList<CoordinatorLibraryRef> _deps;
+    QList<CoordinatorLibraryRef> _modules;
 };
 
 #endif // COORDINATORLIBRARY_H

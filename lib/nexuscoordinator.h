@@ -1,15 +1,17 @@
 #ifndef NEXUSCOORDINATOR_H
 #define NEXUSCOORDINATOR_H
 
+#include <modularcore.h>
+
 #include <QSharedPointer>
 #include <QVariantMap>
 #include <QStringList>
 
-class CoordinatorService;
-
 #include "coordinatorlibrary.h"
 
-class NexusCoordinator : QObject
+class CoordinatorService;
+
+class NexusCoordinator : public QObject, public ModularCore
 {
     Q_OBJECT
 

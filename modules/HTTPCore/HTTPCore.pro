@@ -14,13 +14,17 @@ TEMPLATE = lib
 DEFINES += HTTPCORE_LIBRARY
 
 # Versioning
-exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
+exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../../extern/GitProjectVersionQt/version.pri)
 
 # Project Files
-SOURCES += httpprocessor.cpp
+SOURCES += httpprocessor.cpp \
+    httppacket.cpp \
+    httpserver.cpp
 
 HEADERS += httpprocessor.h\
-        httpcore_global.h
+    httppacket.h \
+	global.h \
+    httpserver.h
 
 unix:!symbian {
     maemo5 {
@@ -30,3 +34,10 @@ unix:!symbian {
     }
     INSTALLS += target
 }
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/release/ -lNexusComm
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/debug/ -lNexusComm
+else:unix: LIBS += -L$$OUT_PWD/../../extern/NexusComm/ -lNexusComm
+
+INCLUDEPATH += $$PWD/../../extern/NexusComm
+DEPENDPATH += $$PWD/../../extern/NexusComm

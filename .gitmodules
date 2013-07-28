@@ -4,3 +4,9 @@
 [submodule "extern/NexusConfig"]
 	path = extern/NexusConfig
 	url = https://github.com/NexusTools/NexusConfig.git
+[submodule "extern/ModularCore"]
+	path = extern/ModularCore
+	url = git@github.com:NexusTools/ModularCore.git
+[submodule "extern/GitProjectVersionQt"]
+	path = extern/GitProjectVersionQt
+	url = git@github.com:NexusTools/GitProjectVersionQt.git

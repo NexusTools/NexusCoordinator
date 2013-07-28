@@ -10,7 +10,7 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # Versioning
-exists($$PWD/../version.pri) : include($$PWD/../version.pri)
+exists($$PWD/../extern/GitProjectVersionQt/version.pri) : include($$PWD/../extern/GitProjectVersionQt/version.pri)
 
 # Project Information
 TARGET = NexusCoordinatorGUI

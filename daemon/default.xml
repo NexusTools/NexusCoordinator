@@ -12,12 +12,14 @@
 				<Host name="ControlPanel" port="2034" processor="HTTPServerManagment" />
 			</Hosts>
 		</Service>
+		<Service class="FTPServer" />
 		<Service class="MailServer" />
 		<Service class="DNSServer" />
 	</Services>
 	<Modules>
-		<Module class="SoftwareManagment" />
+		<Module class="AccountSystem" />
+		<Module class="PAMAuthentication" />
 		<Module class="DebianPackageManagement" />
-		<Module class="PAMUserAuthentication" />
+		<Module class="HTTPServerManagment" />
 	</Modules>
 </NexusCoordinator>

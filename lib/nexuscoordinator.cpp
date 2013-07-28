@@ -185,11 +185,11 @@ CoordinatorLibrary* CoordinatorLibrary::create(QString name, QString type, QStri
             throw "Could not open binary...";
     }
 
-    QList<CoordinatorLibraryRef> deps;
+    QList<CoordinatorLibraryRef> modules;
     foreach(QVariant module, metaData.value("Modules").toList()) {
         CoordinatorLibraryRef mod = NexusCoordinator::instance()->loadModule(module);
         if(!mod.isNull())
-            deps.append(mod);
+            modules.append(mod);
     }
 
     QSharedPointer<QLibrary> lib(new QLibrary(libPath));
@@ -219,12 +219,14 @@ CoordinatorLibrary* CoordinatorLibrary::create(QString name, QString type, QStri
         }
 
         CoordinatorLibrary* library = new CoordinatorLibrary(lib);
+        library->_metaData = metaData;
 
         library->_id = ID;
         library->_name = name;
-        library->_deps = deps;
-        library->_version = version;
-        library->_metaData = metaData;
+        library->_modules = modules;
+        library->_version = library->_metaData.take("Version").toString();
+        if(!version.isEmpty())
+            library->_version = version;
         library->_defaults = library->_metaData.take("DefaultConfig").toMap();
 
         return library;

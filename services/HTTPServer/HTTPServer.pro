@@ -12,8 +12,7 @@ TEMPLATE = lib
 DEFINES += EXPORT_DECL
 
 # Versioning
-VER_MIN = 1
-exists($$PWD/../../version.pri) : include($$PWD/../../version.pri)
+exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../../extern/GitProjectVersionQt/version.pri)
 
 # Project Files
 SOURCES += httpserver.cpp

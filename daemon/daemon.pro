@@ -15,7 +15,7 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 # Versioning
-exists($$PWD/../version.pri) : include($$PWD/../version.pri)
+exists($$PWD/../extern/GitProjectVersionQt/version.pri) : include($$PWD/../extern/GitProjectVersionQt/version.pri)
 
 # Project Files
 SOURCES += main.cpp
@@ -53,3 +53,10 @@ exists($$PWD/../extern/NexusConfig/NexusConfig.pro) {
 	INCLUDEPATH += $$PWD/../extern/NexusConfig
 	DEPENDPATH += $$PWD/../extern/NexusConfig
 }
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/ModularCore/release/ -lModularCore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/ModularCore/debug/ -lModularCore
+else:unix: LIBS += -L$$OUT_PWD/../extern/ModularCore/ -lModularCore
+
+INCLUDEPATH += $$PWD/../extern/ModularCore
+DEPENDPATH += $$PWD/../extern/ModularCore

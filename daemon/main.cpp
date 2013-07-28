@@ -4,9 +4,10 @@
 
 #include <signal.h>
 
+#include <nexusconfig.h>
 #include <coordinatorservice.h>
 #include <nexuscoordinator.h>
-#include <nexusconfig.h>
+#include <project-version.h>
 
 inline void reloadConfig() {
     NexusCoordinator::init(NexusConfig::parseFile("config.xml", NexusConfig::XmlFormat).toMap());
@@ -36,14 +37,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     a.setApplicationName("NexusCoordinator");
     a.setOrganizationName("NexusTools");
-
-#ifdef GIT_REVISION
-    a.setApplicationVersion(VER_MAJ "." VER_MIN "." GIT_REVISION " (" GIT_BRANCH ")");
-#elif defined(VER_MAJ)
-    a.setApplicationVersion(VER_MAJ "." VER_MIN " (Unknown Branch)");
-#else
-    a.setApplicationVersion("Unknown Version (Unknown Branch)");
-#endif
+    a.setApplicationVersion(VERSION);
 
     qDebug() << QString("NexusCoordinator V" + a.applicationVersion()).toLocal8Bit().data();
 
