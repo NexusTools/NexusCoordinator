@@ -1,6 +1,7 @@
 #ifndef HTTPREQUESTHANDLER_H
 #define HTTPREQUESTHANDLER_H
 
+#include <QVariantMap>
 #include <QObject>
 
 class HTTPPacket;

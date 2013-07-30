@@ -25,11 +25,13 @@ void handleSignal(int signum) {
     }
 }
 
-void connectSignal (int __sig, __sighandler_t __handler) {
-    qDebug() << __sig << (void*)__handler;
+void connectSignal (int __sig, __sighandler_t __handler, const char* name) {
+    qDebug() << __sig << (void*)__handler << name;
     if(signal(__sig, __handler) == SIG_ERR)
         qWarning() << "Failed to connect signal";
 }
+
+#define WATCH_SIGNAL(SIG) connectSignal(SIG, handleSignal, #SIG)
 #endif
 
 int main(int argc, char *argv[])
@@ -52,12 +54,15 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_UNIX
     qDebug() << "Connecting signals...";
-    connectSignal(SIGHUP, handleSignal);
-    connectSignal(SIGQUIT, handleSignal);
-    connectSignal(SIGINT, handleSignal);
-    connectSignal(SIGABRT, handleSignal);
-    connectSignal(SIGTRAP, handleSignal);
-    connectSignal(SIGTERM, handleSignal);
+    WATCH_SIGNAL(SIGHUP);
+
+    WATCH_SIGNAL(SIGINT);
+    WATCH_SIGNAL(SIGQUIT);
+
+    WATCH_SIGNAL(SIGTRAP);
+    WATCH_SIGNAL(SIGABRT);
+
+    WATCH_SIGNAL(SIGTERM);
 #endif // TODO: Windows error handling
 
     qDebug() << "Starting services...";
