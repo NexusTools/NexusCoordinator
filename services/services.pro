@@ -4,4 +4,5 @@ SUBDIRS += \
     ControlServer \
     HTTPServer \
     MailServer \
-    FTPServer
+    FTPServer \
+    DNSServer

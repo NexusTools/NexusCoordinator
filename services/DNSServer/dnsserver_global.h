@@ -1,0 +1,12 @@
+#ifndef DNSSERVER_GLOBAL_H
+#define DNSSERVER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(DNSSERVER_LIBRARY)
+#  define DNSSERVERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define DNSSERVERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // DNSSERVER_GLOBAL_H
