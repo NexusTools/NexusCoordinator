@@ -8,4 +8,4 @@ ControlServer::ControlServer()
 }
 
 BeginModule(ControlServer, Service)
-EndModule()
+FinishModule()

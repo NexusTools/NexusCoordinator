@@ -1,17 +1,14 @@
 #ifndef HTTPPROCESSOR_H
 #define HTTPPROCESSOR_H
 
-#include "global.h"
+#include "httpabstractprocessor.h"
 
-#include <commpacketprocessor.h>
-
-class HTTPCORESHARED_EXPORT HTTPProcessor : CommPacketProcessor
+class HTTPCORESHARED_EXPORT HTTPProcessor : HTTPAbstractProcessor
 {
-    Q_OBJECT
 public:
     Q_INVOKABLE HTTPProcessor();
 
-    void processData(QByteArray) {}
+    virtual void processData(QByteArray);
 
 };
 

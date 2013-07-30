@@ -1,9 +1,10 @@
 #include <coordinator-macros.h>
 
-#include "httpprocessor.h"
 #include "httpservercore.h"
-#include "httppacket.h"
+#include "httprequesthandler.h"
 
-BeginModule(HTTPServerCore, Module)
-DeclarePlugin(HTTPProcessor)
-EndModule()
+BeginModuleNamespace(HTTPCore, Module)
+DeclarePlugin(HTTPServerCore)
+DeclarePlugin(HTTPRequestHandler)
+DeclarePlugin(HTTPFileRequestHandler)
+FinishModule()

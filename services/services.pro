@@ -2,4 +2,6 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ControlServer \
-    HTTPServer
+    HTTPServer \
+    MailServer \
+    FTPServer

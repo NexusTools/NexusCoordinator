@@ -7,4 +7,4 @@ ModuleManagment::ModuleManagment()
 }
 
 BeginModule(ModuleManagment, Module)
-EndModule()
+FinishModule()

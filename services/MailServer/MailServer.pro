@@ -1,34 +1,24 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-07-27T08:24:15
+# Project created by QtCreator 2013-07-28T17:04:02
 #
 #-------------------------------------------------
 
-# Qt Modules
 QT       -= gui
 
-# Project Information
-TARGET = HTTPCore
+TARGET = MailServer
 TEMPLATE = lib
 
-DEFINES += HTTPCORE_LIBRARY
+DEFINES += MAILSERVER_LIBRARY
 
 # Versioning
 exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../../extern/GitProjectVersionQt/version.pri)
 
-# Project Files
-SOURCES += \
-    httppacket.cpp \
-    httpservercore.cpp \
-    module.cpp
 
-HEADERS +=\
-    httppacket.h \
-	global.h \
-    httpservercore.h \
-    httprequesthandler.h \
-    httpabstractprocessor.h \
-    httpprocessor.h
+SOURCES += mailserver.cpp
+
+HEADERS += mailserver.h\
+        mailserver_global.h
 
 unix:!symbian {
     maemo5 {
@@ -52,10 +42,3 @@ else:unix: LIBS += -L$$OUT_PWD/../../lib/ -lNexusCoordinator
 
 INCLUDEPATH += $$PWD/../../lib
 DEPENDPATH += $$PWD/../../lib
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/release/ -lNexusComm
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/debug/ -lNexusComm
-else:unix: LIBS += -L$$OUT_PWD/../../extern/NexusComm/ -lNexusComm
-
-INCLUDEPATH += $$PWD/../../extern/NexusComm
-DEPENDPATH += $$PWD/../../extern/NexusComm

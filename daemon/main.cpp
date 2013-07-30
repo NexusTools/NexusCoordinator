@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     a.setOrganizationName("NexusTools");
     a.setApplicationVersion(VERSION);
 
-    qDebug() << QString("NexusCoordinator V" + a.applicationVersion()).toLocal8Bit().data();
+    qDebug() << qPrintable(QString("NexusCoordinator V" + a.applicationVersion()));
 
 
     try {

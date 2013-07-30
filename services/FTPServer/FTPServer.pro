@@ -1,43 +1,23 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-07-27T08:24:15
+# Project created by QtCreator 2013-07-28T17:24:27
 #
 #-------------------------------------------------
 
-# Qt Modules
 QT       -= gui
 
-# Project Information
-TARGET = HTTPCore
+TARGET = FTPServer
 TEMPLATE = lib
 
-DEFINES += HTTPCORE_LIBRARY
+DEFINES += FTPSERVER_LIBRARY
 
 # Versioning
 exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../../extern/GitProjectVersionQt/version.pri)
 
-# Project Files
-SOURCES += \
-    httppacket.cpp \
-    httpservercore.cpp \
-    module.cpp
+SOURCES += ftpserver.cpp
 
-HEADERS +=\
-    httppacket.h \
-	global.h \
-    httpservercore.h \
-    httprequesthandler.h \
-    httpabstractprocessor.h \
-    httpprocessor.h
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+HEADERS += ftpserver.h\
+		ftpserver_global.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/ModularCore/release/ -lModularCore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/ModularCore/debug/ -lModularCore
@@ -52,10 +32,3 @@ else:unix: LIBS += -L$$OUT_PWD/../../lib/ -lNexusCoordinator
 
 INCLUDEPATH += $$PWD/../../lib
 DEPENDPATH += $$PWD/../../lib
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/release/ -lNexusComm
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/NexusComm/debug/ -lNexusComm
-else:unix: LIBS += -L$$OUT_PWD/../../extern/NexusComm/ -lNexusComm
-
-INCLUDEPATH += $$PWD/../../extern/NexusComm
-DEPENDPATH += $$PWD/../../extern/NexusComm
