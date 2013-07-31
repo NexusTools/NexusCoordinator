@@ -3,18 +3,14 @@
 
 #include "global.h"
 
-#include <commpacketprocessor.h>
-
 class HTTPPacket;
 
-class HTTPCORESHARED_EXPORT HTTPAbstractProcessor : CommPacketProcessor
+class HTTPCORESHARED_EXPORT HTTPAbstractProcessor
 {
 protected:
     HTTPAbstractProcessor();
 
-    void emitPacket(HTTPPacket* httpPacket) {
-        emit packetParsed(CommPacketRef((CommPacket*)httpPacket));
-    }
+    void emitPacket(HTTPPacket*) {}
 };
 
 #endif // HTTPABSTRACTPROCESSOR_H

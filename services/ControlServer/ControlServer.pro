@@ -15,10 +15,13 @@ DEFINES += EXPORT_DECL
 exists($$PWD/../../extern/GitProjectVersionQt/version.pri) : include($$PWD/../../extern/GitProjectVersionQt/version.pri)
 
 # Project Files
-SOURCES += controlserver.cpp
+SOURCES += controlserver.cpp \
+    textcommandprocessor.cpp \
+    modules.cpp
 
 HEADERS += controlserver.h \
-    global.h
+    global.h \
+    textcommandprocessor.h
 
 OTHER_FILES += \
 	library.xml

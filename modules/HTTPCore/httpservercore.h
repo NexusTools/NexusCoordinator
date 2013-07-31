@@ -1,8 +1,6 @@
 #ifndef HTTPSERVERCORE_H
 #define HTTPSERVERCORE_H
 
-#include <commservergroup.h>
-
 #include <QStringList>
 #include <QRegExp>
 
@@ -14,9 +12,8 @@ class QMetaObject;
 
 typedef quintptr vhostptr;
 
-class HTTPServerCore : public CommServerGroup
+class HTTPServerCore// : public CommServerGroup
 {
-    Q_OBJECT
 public:
     Q_INVOKABLE HTTPServerCore();
 
@@ -33,9 +30,9 @@ private:
         RequestHandler* handler;
     };
 
-    QHash<QRegExp, VHost*> _hosts;
-    QMap<vhostptr, VHost*> _hostMap;
-    QHash<QString, HTTPAbstractProcessor*> _protocolHandlers;
+    //QHash<QRegExp, VHost*> _hosts;
+    //QMap<vhostptr, VHost*> _hostMap;
+    //QHash<QString, HTTPAbstractProcessor*> _protocolHandlers;
 
     static QHash<QString, QMetaObject*> _knownProtocolHandlers;
 };

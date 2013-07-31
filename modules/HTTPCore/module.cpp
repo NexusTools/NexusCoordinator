@@ -1,11 +1,9 @@
 #include <coordinator-macros.h>
 
-#include <QRectF>
-
 #include "httpservercore.h"
 #include "httprequesthandler.h"
 
 BeginModuleNamespace(HTTPCore, Module)
-DeclarePlugin(HTTPFileRequestHandler)
-DeclarePlugin(HTTPServerCore)
+//DeclarePlugin(HTTPFileRequestHandler)
+//DeclarePlugin(HTTPServerCore)
 FinishModule()

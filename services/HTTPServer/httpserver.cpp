@@ -3,11 +3,17 @@
 #include <coordinator-macros.h>
 #include <modularcore.h>
 
+//#include <commstream.h>
+
 HTTPServer::HTTPServer()
 {
 }
 
 void HTTPServer::startImpl() {
+    //CommTcpStream testStream("nexustools.net", 80);
+
+
+    /*
     foreach(QVariant value, config<QVariantList>("Hosts")) {
         QStringList listen;
         QVariantMap host = value.toMap();
@@ -36,6 +42,7 @@ void HTTPServer::startImpl() {
             qCritical() << "Could not configure VHost: Unknown exception thrown";
         }
     }
+    */
 }
 
 void HTTPServer::stopImpl() {

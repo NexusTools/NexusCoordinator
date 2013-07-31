@@ -4,7 +4,6 @@
 #include "global.h"
 
 #include <coordinatorservice.h>
-#include <commservergroup.h>
 #include <httpservercore.h>
 
 class EXPORTED HTTPServer : CoordinatorService

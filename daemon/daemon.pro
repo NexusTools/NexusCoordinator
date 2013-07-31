@@ -7,6 +7,8 @@
 # Qt Modules
 QT       -= gui
 
+!greaterThan(QT_MAJOR_VERSION, 4): DEFINES += LEGACY_QT
+
 # Project Information
 TARGET = NexusCoordinatorDaemon
 CONFIG   += console

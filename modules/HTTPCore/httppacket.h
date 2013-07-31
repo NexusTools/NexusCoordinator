@@ -5,10 +5,10 @@
 
 #include <QHash>
 
-class HTTPPacket : public RawCommPacket
+class HTTPPacket// : public RawCommPacket
 {
 public:
-    Q_INVOKABLE inline explicit HTTPPacket(QByteArray payload =QByteArray()) : RawCommPacket(payload) {}
+    Q_INVOKABLE inline explicit HTTPPacket(QByteArray payload =QByteArray()) {}// : RawCommPacket(payload) {}
 
 private:
     uint _status;
