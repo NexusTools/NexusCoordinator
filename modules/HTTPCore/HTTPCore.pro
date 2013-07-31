@@ -28,16 +28,7 @@ HEADERS +=\
     httpservercore.h \
     httprequesthandler.h \
     httpabstractprocessor.h \
-    httpprocessor.h
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+	httpprocessor.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../extern/ModularCore/release/ -lModularCore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../extern/ModularCore/debug/ -lModularCore

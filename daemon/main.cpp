@@ -37,11 +37,11 @@ void connectSignal (int __sig, __sighandler_t __handler, const char* name) {
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    a.setApplicationName("NexusCoordinator");
     a.setOrganizationName("NexusTools");
+    a.setApplicationName("NexusCoordinator");
     a.setApplicationVersion(VERSION);
 
-    qDebug() << qPrintable(QString("NexusCoordinator V" + a.applicationVersion()));
+    qDebug() << qPrintable("NexusCoordinator V" VERSION);
 
 
     try {

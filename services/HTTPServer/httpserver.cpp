@@ -8,7 +8,7 @@ HTTPServer::HTTPServer()
 }
 
 void HTTPServer::startImpl() {
-    CommServerGroup* httpCore = provider()->core()->module("HTTPCore")->createCompatiblePlugin<CommServerGroup>();
+    CommServerGroup* httpCore = 0;// = provider()->core()->module("HTTPCore")->createCompatiblePlugin<CommServerGroup>();
     qDebug() << httpCore;
 
     foreach(QVariant value, config<QVariantList>("Hosts")) {

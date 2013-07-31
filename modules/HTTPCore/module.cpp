@@ -1,5 +1,7 @@
 #include <coordinator-macros.h>
 
+#include <QRectF>
+
 #include "httpservercore.h"
 #include "httprequesthandler.h"
 

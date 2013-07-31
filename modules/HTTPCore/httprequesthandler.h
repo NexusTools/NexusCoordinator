@@ -32,11 +32,11 @@ class HTTPFileRequestHandler : public HTTPRequestHandler
 public:
     Q_INVOKABLE HTTPFileRequestHandler(QString rootPath =QString("/var/www"));
 
-    virtual QVariantMap toMap();
-    virtual void fromMap(QVariantMap);
+    virtual QVariantMap toMap() {return QVariantMap();}
+    virtual void fromMap(QVariantMap) {}
 
 protected:
-    virtual void handle(HTTPPacket&);
+    virtual void handle(HTTPPacket&) {}
 
 
 };
