@@ -6,7 +6,6 @@
 #include "httprequesthandler.h"
 
 BeginModuleNamespace(HTTPCore, Module)
-DeclarePlugin(HTTPServerCore)
-DeclarePlugin(HTTPRequestHandler)
 DeclarePlugin(HTTPFileRequestHandler)
+DeclarePlugin(HTTPServerCore)
 FinishModule()
