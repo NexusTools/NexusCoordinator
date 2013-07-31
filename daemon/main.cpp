@@ -59,7 +59,7 @@ void __msgOutput(QtMsgType type, const QMessageLogContext &ctx, const QString &m
         textStream << QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
         textStream << "] [";
         {
-            QObject* thread = QThread::currentThread();
+            QThread* thread = QThread::currentThread();
             QByteArray name = thread->objectName().toLocal8Bit();
             if(name.isEmpty())
                 name = thread->metaObject()->className();
@@ -67,6 +67,30 @@ void __msgOutput(QtMsgType type, const QMessageLogContext &ctx, const QString &m
             textStream << ' ';
             textStream << thread;
         }
+        textStream << "] [";
+
+        switch(type) {
+            case QtDebugMsg:
+                textStream << "DEBUG";
+            break;
+
+            case QtWarningMsg:
+                textStream << "WARNING";
+            break;
+
+            case QtCriticalMsg:
+                textStream << "CRITICAL";
+            break;
+
+            case QtFatalMsg:
+                textStream << "FATAL";
+            break;
+
+            default:
+                textStream << "UNKNOWN";
+            break;
+        }
+
         textStream << "] ";
 
 #ifndef LEGACY_QT
@@ -89,29 +113,7 @@ void __msgOutput(QtMsgType type, const QMessageLogContext &ctx, const QString &m
         textStream << file << ':' << ctx.line << '\n'; */
 #endif
 
-        switch(type) {
-            case QtDebugMsg:
-                textStream << "[DEBUG]";
-            break;
-
-            case QtWarningMsg:
-                textStream << "[WARNING]";
-            break;
-
-            case QtCriticalMsg:
-                textStream << "[CRITICAL]";
-            break;
-
-            case QtFatalMsg:
-                textStream << "[FATAL]";
-            break;
-
-            default:
-                textStream << "[UNKNOWN]";
-            break;
-        }
-
-        textStream << ' ' << msg << "\n";
+        textStream << msg << "\n";
     }
 
 
@@ -134,14 +136,18 @@ int main(int argc, char *argv[])
     a.setApplicationName("NexusCoordinator");
     a.setApplicationVersion(VERSION);
 
+    {
+        const char* msg = "Starting NexusCoordinator Daemon V" VERSION "\n\n";
+        fwrite(msg, 1, strlen(msg), stdout);
+        fflush(stdout);
+    }
+
     // Custom message handler'
 #ifdef LEGACY_QT
     qInstallMsgHandler(__msgOutput);
 #else
     qInstallMessageHandler(__msgOutput);
 #endif
-
-    qDebug() << qPrintable("NexusCoordinator V" VERSION);
 
     readConfig();
 
