@@ -30,7 +30,7 @@ class HTTPFileRequestHandler : public HTTPRequestHandler
 
     friend class HTTPServerCore;
 public:
-    Q_INVOKABLE HTTPFileRequestHandler(QString rootPath =QString("/var/www"));
+    Q_INVOKABLE inline HTTPFileRequestHandler(QString rootPath =QString("/var/www")) {}
 
     virtual QVariantMap toMap() {return QVariantMap();}
     virtual void fromMap(QVariantMap) {}
