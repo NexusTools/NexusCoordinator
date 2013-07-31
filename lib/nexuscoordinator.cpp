@@ -10,9 +10,9 @@ NexusCoordinator::NexusCoordinator() {
     registerType("Module", "modules", "Modules");
 }
 
-bool NexusCoordinator::loadConfig(QVariantMap data) {
+bool NexusCoordinator::readConfig(QVariantMap data) {
     _configModules.clear();
-    qDebug() << "Loading modules...";
+    qDebug() << "Checking dependancies ...";
     foreach(QVariant raw, data.value("Modules").toList()) {
         Module::Ref lib = loadModule(raw);
 
@@ -21,7 +21,7 @@ bool NexusCoordinator::loadConfig(QVariantMap data) {
     }
 
     QStringList takenNames;
-    qDebug() << "Loading services...";
+    qDebug() << "Configuring services ...";
     foreach(QVariant raw, data.value("Services").toList()) {
         try {
             QVariantMap serviceConfig = raw.toMap();
@@ -47,7 +47,7 @@ bool NexusCoordinator::loadConfig(QVariantMap data) {
 		} catch(QString reason) {
 			qWarning() << "Failed to load:" << reason.toLocal8Bit().data();
 		} catch(...) {
-			qWarning() << "Unknown exception caught while loading...";
+            qCritical() << "Unknown exception caught while loading!";
 		}
     }
 
@@ -55,8 +55,6 @@ bool NexusCoordinator::loadConfig(QVariantMap data) {
 }
 
 CoordinatorService* NexusCoordinator::createService(QString name, QString clazz, QVariantMap config) {
-    qDebug() << QString("%1 (%2)").arg(clazz).arg(name).toLocal8Bit().data();
-
     CoordinatorService* service = _services.value(name);
     if(service && (!service->provider() ||
                    service->provider()->name() != clazz)) {
@@ -75,7 +73,7 @@ CoordinatorService* NexusCoordinator::createService(QString name, QString clazz,
                 service->setConfig(config);
                 _services.insert(name, service);
             } else
-                throw "createCompatiblePlugin failed";
+                throw "createCompatiblePlugin<CoordinatorService>() failed";
         } else
             throw "Failed to create instance of service library";
     }

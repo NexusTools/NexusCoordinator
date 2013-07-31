@@ -25,10 +25,10 @@ public:
         if(!_instance)
             _instance = new NexusCoordinator();
         if(!config.isEmpty())
-            _instance->loadConfig(config);
+            _instance->readConfig(config);
     }
 
-    bool loadConfig(QVariantMap);
+    bool readConfig(QVariantMap);
 
     inline CoordinatorService* service(QString name) const{return _services.value(name);}
     inline QList<CoordinatorService*> services() const{return _services.values();}

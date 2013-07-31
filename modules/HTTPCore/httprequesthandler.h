@@ -38,7 +38,6 @@ public:
 protected:
     virtual void handle(HTTPPacket&) {}
 
-
 };
 
 #endif // HTTPREQUESTHANDLER_H

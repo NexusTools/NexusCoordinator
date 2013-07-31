@@ -9,18 +9,27 @@
 #include <nexuscoordinator.h>
 #include <project-version.h>
 
-inline void reloadConfig() {
-    NexusCoordinator::init(NexusConfig::parseFile("config.xml", NexusConfig::XmlFormat).toMap());
+inline void readConfig() {
+    qDebug() << "Reading configuration ...";
+    try {
+        NexusCoordinator::init(NexusConfig::parseFile("config.xml", NexusConfig::XmlFormat).toMap());
+    } catch(const char* err) {
+        qWarning() << err;
+        qDebug() << "Using internal default configuration instead.";
+        NexusCoordinator::init(NexusConfig::parseFile(":/default.xml", NexusConfig::XmlFormat).toMap());
+    }
 }
 
 #ifdef Q_OS_LINUX
 void handleSignal(int signum) {
-    qDebug() << "Signal received" << signum;
+    QDebug debug(QtDebugMsg);
+    debug << "Signal received" << signum << "...";
 
-    if(signum == SIGHUP)
-        reloadConfig();
-    else {
-        qDebug() << "Quitting";
+    if(signum == SIGHUP) {
+        debug << "Reloading";
+        readConfig();
+    } else {
+        debug << "Quitting";
         QCoreApplication::instance()->quit();
     }
 }
@@ -43,17 +52,10 @@ int main(int argc, char *argv[])
 
     qDebug() << qPrintable("NexusCoordinator V" VERSION);
 
-
-    try {
-        reloadConfig();
-    } catch(const char* err) {
-        qWarning() << err;
-        qDebug() << "Using internal default configuration instead.";
-        NexusCoordinator::init(NexusConfig::parseFile(":/default.xml", NexusConfig::XmlFormat).toMap());
-    }
+    readConfig();
 
 #ifdef Q_OS_UNIX
-    qDebug() << "Connecting signals...";
+    qDebug() << "Connecting signals ...";
     WATCH_SIGNAL(SIGHUP);
 
     WATCH_SIGNAL(SIGINT);
@@ -65,9 +67,9 @@ int main(int argc, char *argv[])
     WATCH_SIGNAL(SIGTERM);
 #endif // TODO: Windows error handling
 
-    qDebug() << "Starting services...";
+    qDebug() << "Starting services ...";
     if(NexusCoordinator::instance()->services().isEmpty())
-        qFatal("No services loaded, please fix your configuration");
+        qFatal("No services configured, please fix your configuration");
 
     foreach(CoordinatorService* srv, NexusCoordinator::instance()->services())
         srv->start();
