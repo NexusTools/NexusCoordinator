@@ -22,6 +22,8 @@ public:
         _blinkTimer.setInterval(400);
         connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkDateTime()));
 
+        connect(&_dateTime, SIGNAL(clicked()), this, SLOT(notifyClicked()));
+
         QTimer::singleShot(1500, this, SLOT(testMessageSystem()));
         updateDateTime();
         fixLayoutImpl();
@@ -52,6 +54,10 @@ public:
     }
 
 public slots:
+    inline void notifyClicked() {
+        _messages << "I was clicked!";
+    }
+
     inline void testMessageSystem() {
         _messages << "Tuna Fish!";
     }
@@ -87,7 +93,6 @@ public slots:
 protected:
     inline virtual void fixLayoutImpl() {
         CursesMainWindow::fixLayoutImpl();
-
         _dateTime.move(width()-_dateTime.width(), 0);
     }
 
