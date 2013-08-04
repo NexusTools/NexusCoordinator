@@ -15,5 +15,8 @@ int main(int argc, char *argv[])
     a.setApplicationVersion(VERSION);
 
     CoordinatorConsole console;
-    return a.exec();
+    int ret = a.exec();
+    endwin();
+
+    return ret;
 }

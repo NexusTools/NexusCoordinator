@@ -26,9 +26,12 @@ public:
         connect(&_statusBar, SIGNAL(clicked()), this, SLOT(notifyClicked()));
 
         QStringList menus;
-        menus << "Servers" << "Theme" << "Help" << "Quit";
+        menus << "Servers" << "Theme" << "Help";
         foreach(QString menu, menus)
             new CursesAction(menu, &_menuBar);
+
+        CursesAction* quit = new CursesAction("Quit", &_menuBar);
+        connect(quit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
         updateStatusMessage();
         fixLayoutImpl();
@@ -89,15 +92,13 @@ public slots:
             _statusBar.setText(nextMessage);
         } else
             _statusBar.setText(QDateTime::currentDateTime().toString());
-
-        fixLayoutImpl();
     }
 
 protected:
     inline virtual void fixLayoutImpl() {
         CursesMainWindow::fixLayoutImpl();
 
-        _menuBar.resize(width()-_statusBar.width(), 1);
+        _menuBar.resize(QSize(80, 1));
         _statusBar.move(width()-_statusBar.width(), 0);
     }
 
