@@ -2,5 +2,5 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS += NexusComm NexusConfig \
-	ModularCore
+SUBDIRS +=  NexusConfig GenericUI \
+	ModularCore #NexusComm

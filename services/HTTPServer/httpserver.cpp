@@ -10,9 +10,6 @@ HTTPServer::HTTPServer()
 }
 
 void HTTPServer::startImpl() {
-    //CommTcpStream testStream("nexustools.net", 80);
-
-
     /*
     foreach(QVariant value, config<QVariantList>("Hosts")) {
         QStringList listen;

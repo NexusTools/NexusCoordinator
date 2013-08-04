@@ -10,3 +10,6 @@
 [submodule "extern/GitProjectVersionQt"]
 	path = extern/GitProjectVersionQt
 	url = git@github.com:NexusTools/GitProjectVersionQt.git
+[submodule "extern/GenericUI"]
+	path = extern/GenericUI
+	url = git@github.com:NexusTools/GenericUI.git

@@ -21,7 +21,9 @@ SOURCES += controlserver.cpp \
 
 HEADERS += controlserver.h \
     global.h \
-    textcommandprocessor.h
+    textcommandprocessor.h \
+    controlpacket.h \
+    controlclient.h
 
 OTHER_FILES += \
 	library.xml

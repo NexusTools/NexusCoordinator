@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    ControlServer \
-    HTTPServer \
-    MailServer \
-    FTPServer \
-    DNSServer
+	#ControlServer \
+	#HTTPServer \
+#    MailServer \
+#    FTPServer \
+#    DNSServer

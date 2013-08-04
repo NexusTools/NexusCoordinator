@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    HTTPCore \
-    ModuleManagment
+#    HTTPCore \
+#    ModuleManagment

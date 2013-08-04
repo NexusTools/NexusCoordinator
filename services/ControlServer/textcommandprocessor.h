@@ -2,11 +2,11 @@
 #define TEXTCOMMANDPROCESSOR_H
 
 #include <commpacketprocessor.h>
-#include <QObject>
 
-class TextCommandProcessor : public QObject
+#include "controlpacket.h"
+
+class TextCommandProcessor : public ControlPacketProcessor
 {
-    Q_OBJECT
 public:
     explicit TextCommandProcessor();
 

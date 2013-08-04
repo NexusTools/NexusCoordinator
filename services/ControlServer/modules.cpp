@@ -4,5 +4,4 @@
 #include "textcommandprocessor.h"
 
 BeginModule(ControlServer, Service)
-DeclarePlugin(TextCommandProcessor)
 FinishModule()
