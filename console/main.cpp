@@ -14,13 +14,6 @@ int main(int argc, char *argv[])
     a.setApplicationName("NexusCoordinator");
     a.setApplicationVersion(VERSION);
 
-    {
-        const char* msg = "Starting NexusCoordinator Console V" VERSION "\n\n";
-        fwrite(msg, 1, strlen(msg), stdout);
-        fflush(stdout);
-        sleep(2);
-    }
-
     CoordinatorConsole console;
     return a.exec();
 }

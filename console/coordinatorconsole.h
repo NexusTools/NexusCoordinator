@@ -2,7 +2,9 @@
 #define COORDINATORCONSOLE_H
 
 #include <cursesmainwindow.h>
+#include <cursesmenubar.h>
 #include <curseslabel.h>
+#include <cursesaction.h>
 
 #include <QCoreApplication>
 #include <QStringList>
@@ -14,18 +16,21 @@ class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
 public:
-    inline explicit CoordinatorConsole() : CursesMainWindow("NexusCoordinator Console"), _dateTime(this) {
+    inline explicit CoordinatorConsole() : CursesMainWindow("NexusCoordinator Console"), _menuBar(this), _statusBar(this) {
         _updateDateTime.setInterval(1000);
-        connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateDateTime()));
+        connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
         _updateDateTime.start();
 
         _blinkTimer.setInterval(600);
-        connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkDateTime()));
+        connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkStatus()));
+        connect(&_statusBar, SIGNAL(clicked()), this, SLOT(notifyClicked()));
 
-        connect(&_dateTime, SIGNAL(clicked()), this, SLOT(notifyClicked()));
+        QStringList menus;
+        menus << "Servers" << "Theme" << "Help" << "Quit";
+        foreach(QString menu, menus)
+            new CursesAction(menu, &_menuBar);
 
-        QTimer::singleShot(1500, this, SLOT(testMessageSystem()));
-        updateDateTime();
+        updateStatusMessage();
         fixLayoutImpl();
     }
 
@@ -55,29 +60,25 @@ public:
 
 public slots:
     inline void notifyClicked() {
-        _messages << "I was clicked!";
+        _statusQueue << "I was clicked!";
     }
 
-    inline void testMessageSystem() {
-        _messages << "Tuna Fish!";
+    inline void blinkStatus() {
+        _statusBar.setAttr(_statusBar.attr() ^ CursesLabel::Standout);
     }
 
-    inline void blinkDateTime() {
-        _dateTime.setAttr(_dateTime.attr() ^ CursesLabel::Standout);
-    }
-
-    inline void updateDateTime() {
+    inline void updateStatusMessage() {
         QDateTime dateTime = QDateTime::currentDateTime();
         QString nextMessage;
 
         int timeout = 1500;
         _blinkTimer.stop();
-        _dateTime.setAttr(CursesLabel::Dim);
-        if(!_messages.isEmpty()) {
+        _statusBar.setAttr(CursesLabel::Dim);
+        if(!_statusQueue.isEmpty()) {
             timeout += 1500;
             _blinkTimer.start();
-            nextMessage = _messages.takeFirst();
-            _dateTime.setAttr(CursesLabel::Attr(CursesLabel::Bold | CursesLabel::Standout));
+            nextMessage = _statusQueue.takeFirst();
+            _statusBar.setAttr(CursesLabel::Attr(CursesLabel::Bold | CursesLabel::Standout));
         } else if(dateTime.time().second() % 30 == 0)
             nextMessage = QString("%1 V%2").arg(QCoreApplication::instance()->applicationName()).arg(QCoreApplication::instance()->applicationVersion());
 
@@ -85,24 +86,28 @@ public slots:
             _updateDateTime.stop(); // Skip 1.5 seconds, wait 1 more
             QTimer::singleShot(timeout, &_updateDateTime, SLOT(start()));
 
-            _dateTime.setText(nextMessage);
+            _statusBar.setText(nextMessage);
         } else
-            _dateTime.setText(QDateTime::currentDateTime().toString());
+            _statusBar.setText(QDateTime::currentDateTime().toString());
 
-        _dateTime.move(width()-_dateTime.width(), 0);
+        fixLayoutImpl();
     }
 
 protected:
     inline virtual void fixLayoutImpl() {
         CursesMainWindow::fixLayoutImpl();
-        _dateTime.move(width()-_dateTime.width(), 0);
+
+        _menuBar.resize(width()-_statusBar.width(), 1);
+        _statusBar.move(width()-_statusBar.width(), 0);
     }
 
 private:
     QTimer _blinkTimer;
     QTimer _updateDateTime;
-    CursesLabel _dateTime;
-    QStringList _messages;
+    QStringList _statusQueue;
+
+    CursesMenuBar _menuBar;
+    CursesLabel _statusBar;
 };
 
 #endif // COORDINATORCONSOLE_H
