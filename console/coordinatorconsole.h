@@ -19,7 +19,7 @@ public:
         connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateDateTime()));
         _updateDateTime.start();
 
-        _blinkTimer.setInterval(400);
+        _blinkTimer.setInterval(600);
         connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkDateTime()));
 
         connect(&_dateTime, SIGNAL(clicked()), this, SLOT(notifyClicked()));
@@ -70,18 +70,20 @@ public slots:
         QDateTime dateTime = QDateTime::currentDateTime();
         QString nextMessage;
 
+        int timeout = 1500;
         _blinkTimer.stop();
         _dateTime.setAttr(CursesLabel::Dim);
         if(!_messages.isEmpty()) {
+            timeout += 1500;
             _blinkTimer.start();
             nextMessage = _messages.takeFirst();
-            _dateTime.setAttr(CursesLabel::Attr(CursesLabel::Bold));
+            _dateTime.setAttr(CursesLabel::Attr(CursesLabel::Bold | CursesLabel::Standout));
         } else if(dateTime.time().second() % 30 == 0)
             nextMessage = QString("%1 V%2").arg(QCoreApplication::instance()->applicationName()).arg(QCoreApplication::instance()->applicationVersion());
 
         if(!nextMessage.isEmpty()) {
             _updateDateTime.stop(); // Skip 1.5 seconds, wait 1 more
-            QTimer::singleShot(1500, &_updateDateTime, SLOT(start()));
+            QTimer::singleShot(timeout, &_updateDateTime, SLOT(start()));
 
             _dateTime.setText(nextMessage);
         } else
