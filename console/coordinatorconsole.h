@@ -24,6 +24,7 @@ public:
 
         QTimer::singleShot(1500, this, SLOT(testMessageSystem()));
         updateDateTime();
+        fixLayoutImpl();
     }
 
     inline void drawImpl() {
@@ -79,6 +80,13 @@ public slots:
             _dateTime.setText(nextMessage);
         } else
             _dateTime.setText(QDateTime::currentDateTime().toString());
+
+        _dateTime.move(width()-_dateTime.width(), 0);
+    }
+
+protected:
+    inline virtual void fixLayoutImpl() {
+        CursesMainWindow::fixLayoutImpl();
 
         _dateTime.move(width()-_dateTime.width(), 0);
     }
