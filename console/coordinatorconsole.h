@@ -10,12 +10,20 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QTime>
+#include <QFile>
+
+inline QString readHostname() {
+    QFile f("/etc/hostname");
+    if(f.open(QFile::ReadOnly))
+        return QString::fromUtf8(f.readAll());
+    return "Unknown";
+}
 
 class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
 public:
-    inline explicit CoordinatorConsole() : CursesMainWindow("NexusCoordinator Console"), _menuBar(this), _servers("S_ervers", this), _screens("Sc_reens", this), _themes("_Themes", this), _help("_Help", this), _statusBar(this) {
+    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _themes("_Themes", this), _help("_Help", this), _statusBar(this) {
         _updateDateTime.setInterval(1000);
         connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
         _updateDateTime.start();
@@ -24,13 +32,17 @@ public:
         connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkStatus()));
         connect(&_statusBar, SIGNAL(clicked()), this, SLOT(notifyClicked()));
 
-        new CursesAction("Manage", &_servers);
-        _servers.addSeparator();
-        new CursesLabel(" No Servers Configured ", &_servers);
-        _servers.fitToContent();
-
-        CursesAction* action = new CursesAction("_Drop to Shell", &_screens);
+        CursesAction* action = new CursesAction("_Drop to Shell", &_coordinator);
         connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
+        action = new CursesAction("Drop to _Root Shell", &_coordinator);
+                connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
+        _coordinator.addSeparator();
+        new CursesAction("Connect to Server", &_coordinator);
+        action = new CursesAction("E_xit", &_coordinator);
+        connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
+
+        _coordinator.fitToContent();
+
         new CursesAction("Create _Named Screen", &_screens);
         _screens.addSeparator();
         new CursesLabel(" No Named Screens Configured ", &_screens);
@@ -47,13 +59,11 @@ public:
         new CursesAction("Donate", &_help);
         _help.fitToContent();
 
-        _servers.action()->setParent(&_menuBar);
+        _coordinator.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
         _themes.action()->setParent(&_menuBar);
         _help.action()->setParent(&_menuBar);
 
-        CursesAction* quit = new CursesAction("_Quit", &_menuBar);
-        connect(quit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
         updateStatusMessage();
         fixLayoutImpl();
@@ -133,7 +143,7 @@ private:
     QStringList _statusQueue;
 
     CursesMenuBar _menuBar;
-    CursesMenu _servers;
+    CursesMenu _coordinator;
     CursesMenu _screens;
     CursesMenu _themes;
     CursesMenu _help;

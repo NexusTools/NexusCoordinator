@@ -25,6 +25,8 @@ void CoordinatorConsole::dropToShell() {
     }
 
     endwin();
+    sleep(2);
+
     int status;
     while (-1 == waitpid(fork_rv, &status, 0));
 
