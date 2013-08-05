@@ -36,7 +36,7 @@ class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
 public:
-    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _themes("_Themes", this), _help("_Help", this), _statusBar(this) {
+    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _help("_Help", this), _statusBar(this) {
         _updateDateTime.setInterval(1000);
         connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
         _updateDateTime.start();
@@ -61,10 +61,6 @@ public:
         new CursesLabel(" No Named Screens Configured ", &_screens);
         _screens.fitToContent();
 
-        new CursesAction("Ubuntu", &_themes);
-        new CursesAction("H4x0r", &_themes);
-        _themes.fitToContent();
-
         new CursesAction("Contents", &_help);
         new CursesAction("Credits", &_help);
         new CursesAction("Website", &_help);
@@ -74,7 +70,6 @@ public:
 
         _coordinator.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
-        _themes.action()->setParent(&_menuBar);
         _help.action()->setParent(&_menuBar);
 
 
@@ -178,7 +173,6 @@ private:
     CursesMenuBar _menuBar;
     CursesMenu _coordinator;
     CursesMenu _screens;
-    CursesMenu _themes;
     CursesMenu _help;
 
     CursesLabel _statusBar;
