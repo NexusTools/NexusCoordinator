@@ -4,12 +4,31 @@
 #include <sys/wait.h>
 #include <stdio.h>
 
-void CoordinatorConsole::terminateRequested(int sig) {
-    if(fork_rv > 0) {
-        fork_rv = 0;
+#include <QDir>
 
-        _statusQueue << "Process terminated";
-    } else
+#define SCREEN_DIR "/var/run/screen"
+
+void CoordinatorConsole::rescanScreens() {
+    QDir screenDir(SCREEN_DIR);
+    if(screenDir.exists()) {
+        screenListSeparator.show();
+        installScreen.hide();
+        createScreen.show();
+
+    } else {
+        screenListSeparator.hide();
+        installScreen.show();
+        createScreen.hide();
+
+    }
+    _screens.fitToContent();
+    _screens.markDirty();
+}
+
+void CoordinatorConsole::terminateRequested(int sig) {
+    if(fork_rv > 0)
+        _terminated = true;
+    else
         CursesMainWindow::terminateRequested(sig);
 }
 
@@ -26,6 +45,8 @@ void initEnv() {
 }
 
 void CoordinatorConsole::dropToShell() {
+    _terminated = false;
+
     fork_rv = fork();
     if (fork_rv == 0)
     {
@@ -50,7 +71,13 @@ void CoordinatorConsole::dropToShell() {
     sleep(2);
 
     int status;
-    while (-1 == waitpid(fork_rv, &status, 0));
+    while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
+    if(status != 0) {
+        if(_terminated)
+            _statusQueue << "Process terminated";
+        else
+            _statusQueue << "Process crashed";
+    }
     fork_rv=0;
 
     titleChanged();
@@ -58,6 +85,8 @@ void CoordinatorConsole::dropToShell() {
 }
 
 void CoordinatorConsole::aptInstall(QString pkg) {
+    _terminated = false;
+
     fork_rv = fork();
     if (fork_rv == 0)
     {
@@ -68,8 +97,7 @@ void CoordinatorConsole::aptInstall(QString pkg) {
         fflush(stdout);
         initEnv();
 
-        execl("/usr/bin/sudo", "sudo", "/usr/bin/apt", "install", pkg.toLocal8Bit().data(), 0);
-
+        execl("/usr/bin/sudo", "sudo", "/usr/bin/apt-get", "install", pkg.toLocal8Bit().data(), 0);
         _exit(1);
     }
     else if (fork_rv == -1)
@@ -81,15 +109,24 @@ void CoordinatorConsole::aptInstall(QString pkg) {
     endwin();
 
     int status;
-    while (fork_rv > 0 && waitpid(fork_rv, &status, 0));
+    while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
+    if(status != 0) {
+        if(_terminated)
+            _statusQueue << "Process terminated";
+        else
+            _statusQueue << "Process crashed";
+    }
     fork_rv=0;
 
     titleChanged();
     cursesDirtyMainWindow();
+    rescanScreens();
 }
 
 
 void CoordinatorConsole::dropToRootShell() {
+    _terminated = false;
+
     fork_rv = fork();
     if (fork_rv == 0)
     {
@@ -114,6 +151,12 @@ void CoordinatorConsole::dropToRootShell() {
 
     int status;
     while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
+    if(status != 0) {
+        if(_terminated)
+            _statusQueue << "Process terminated";
+        else
+            _statusQueue << "Process crashed";
+    }
     fork_rv=0;
 
     titleChanged();

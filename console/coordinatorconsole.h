@@ -2,6 +2,7 @@
 #define COORDINATORCONSOLE_H
 
 #include <cursesmainwindow.h>
+#include <cursesmenuseparator.h>
 #include <cursesmenubar.h>
 #include <cursesmenu.h>
 
@@ -11,8 +12,6 @@
 #include <QTimer>
 #include <QTime>
 #include <QFile>
-
-#define SCREEN_DIR "/var/run/screen"
 
 inline QString readHostname() {
     QFile f("/etc/hostname");
@@ -38,7 +37,8 @@ class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
 public:
-    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _help("_Help", this), _statusBar(this) {
+    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _help("_Help", this),
+        createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), _statusBar(this) {
         _updateDateTime.setInterval(1000);
         connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
         _updateDateTime.start();
@@ -64,26 +64,19 @@ public:
         action = new CursesAction("E_xit", &_coordinator);
         connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
-        _coordinator.fitToContent();
-
-        new CursesAction("Create Screen", &_screens);
-        _screens.addSeparator();
-        new CursesLabel(" No Screens Found ", &_screens);
-        _screens.fitToContent();
-
         new CursesAction("Contents", &_help);
         new CursesAction("Credits", &_help);
         new CursesAction("Website", &_help);
         new CursesAction("Source", &_help);
         new CursesAction("Donate", &_help);
-        _help.fitToContent();
-        _help.disable();
 
         _coordinator.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
         _help.action()->setParent(&_menuBar);
 
+        connect(&installScreen, SIGNAL(activated()), this, SLOT(installScreenPkg()));
 
+        rescanScreens();
         updateStatusMessage();
         fixLayoutImpl();
         fork_rv = 0;
@@ -176,13 +169,20 @@ protected:
     }
 
 protected slots:
+    inline void installScreenPkg() {
+        aptInstall("screen");
+    }
     void aptInstall(QString package);
 
     void dropToShell();
     void dropToRootShell();
 
+    void rescanScreens();
+
 private:
     int fork_rv;
+    bool _terminated;
+
     QTimer _blinkTimer;
     QTimer _updateDateTime;
     QStringList _statusQueue;
@@ -191,6 +191,11 @@ private:
     CursesMenu _coordinator;
     CursesMenu _screens;
     CursesMenu _help;
+
+    CursesAction createScreen;
+    CursesAction installScreen;
+    CursesMenuSeparator screenListSeparator;
+    QHash<QString, CursesAction*> _screenList;
 
     CursesLabel _statusBar;
 };
