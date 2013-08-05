@@ -30,6 +30,7 @@ void CoordinatorConsole::dropToShell() {
     int status;
     while (-1 == waitpid(fork_rv, &status, 0));
 
+    titleChanged();
     refresh();
 }
 
@@ -60,6 +61,7 @@ void CoordinatorConsole::dropToRootShell() {
     int status;
     while (-1 == waitpid(fork_rv, &status, 0));
 
+    titleChanged();
     refresh();
 }
 
