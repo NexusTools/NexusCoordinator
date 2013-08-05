@@ -106,10 +106,16 @@ public slots:
         QDateTime dateTime = QDateTime::currentDateTime();
         QString nextMessage;
 
+        static bool showOnce = true;
+
         int timeout = 1500;
         _blinkTimer.stop();
         _statusBar.setAttr(CursesLabel::Dim);
-        if(!_statusQueue.isEmpty()) {
+        if(showOnce) {
+            nextMessage = QString("Logged in as %1").arg(getenv("USER"));
+            timeout += 3000;
+            showOnce = false;
+        } else if(!_statusQueue.isEmpty()) {
             timeout += 1500;
             _blinkTimer.start();
             nextMessage = _statusQueue.takeFirst();
