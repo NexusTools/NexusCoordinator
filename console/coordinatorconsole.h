@@ -46,9 +46,9 @@ public:
         connect(&_statusBar, SIGNAL(clicked()), this, SLOT(notifyClicked()));
 
         CursesAction* action = new CursesAction("_Drop to Shell", &_coordinator);
-        connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
+        connect(action, SIGNAL(activated()), this, SLOT(dropToShell()), Qt::QueuedConnection);
         action = new CursesAction("Drop to _Root Shell", &_coordinator);
-                connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()));
+        connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()), Qt::QueuedConnection);
 
         _coordinator.addSeparator();
 
@@ -84,6 +84,7 @@ public:
 
         updateStatusMessage();
         fixLayoutImpl();
+        fork_rv = 0;
     }
 
     inline void drawImpl() {
@@ -162,6 +163,8 @@ public slots:
             _statusBar.setText(QDateTime::currentDateTime().toString());
     }
 
+    virtual void terminateRequested(int);
+
 protected:
     inline virtual void fixLayoutImpl() {
         CursesMainWindow::fixLayoutImpl();
@@ -171,10 +174,13 @@ protected:
     }
 
 protected slots:
+    void aptInstall(QString package);
+
     void dropToShell();
     void dropToRootShell();
 
 private:
+    int fork_rv;
     QTimer _blinkTimer;
     QTimer _updateDateTime;
     QStringList _statusQueue;
