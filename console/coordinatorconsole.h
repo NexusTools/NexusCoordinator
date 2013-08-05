@@ -56,9 +56,9 @@ public:
 
         _coordinator.fitToContent();
 
-        new CursesAction("Create _Named Screen", &_screens);
+        new CursesAction("Create Screen", &_screens);
         _screens.addSeparator();
-        new CursesLabel(" No Named Screens Configured ", &_screens);
+        new CursesLabel(" No Screens Found ", &_screens);
         _screens.fitToContent();
 
         new CursesAction("Contents", &_help);
