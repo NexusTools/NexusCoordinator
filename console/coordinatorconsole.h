@@ -29,7 +29,8 @@ public:
         new CursesLabel(" No Servers Configured ", &_servers);
         _servers.fitToContent();
 
-        new CursesAction("_Drop to Shell", &_screens);
+        CursesAction* action = new CursesAction("_Drop to Shell", &_screens);
+        connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
         new CursesAction("Create _Named Screen", &_screens);
         _screens.addSeparator();
         new CursesLabel(" No Named Screens Configured ", &_screens);
@@ -122,6 +123,9 @@ protected:
         _menuBar.resize(QSize(80, 1));
         _statusBar.move(width()-_statusBar.width(), 0);
     }
+
+protected slots:
+    void dropToShell();
 
 private:
     QTimer _blinkTimer;
