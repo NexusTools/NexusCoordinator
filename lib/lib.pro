@@ -45,3 +45,12 @@ exists($$PWD/../extern/ModularCore/ModularCore.pro) {
 	INCLUDEPATH += $$PWD/../extern/ModularCore
 	DEPENDPATH += $$PWD/../extern/ModularCore
 }
+
+unix:!symbian {
+	maemo5 {
+		target.path = /opt/usr/lib
+	} else {
+		target.path = /usr/lib
+	}
+	INSTALLS += target
+}

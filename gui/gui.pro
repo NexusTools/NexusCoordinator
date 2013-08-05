@@ -23,3 +23,12 @@ SOURCES += main.cpp\
 HEADERS  += nexuscoordinatorgui.h
 
 FORMS    += nexuscoordinatorgui.ui
+
+unix:!symbian {
+	maemo5 {
+		target.path = /opt/usr/bin
+	} else {
+		target.path = /usr/bin
+	}
+	INSTALLS += target
+}

@@ -62,3 +62,12 @@ else:unix: LIBS += -L$$OUT_PWD/../extern/ModularCore/ -lModularCore
 
 INCLUDEPATH += $$PWD/../extern/ModularCore
 DEPENDPATH += $$PWD/../extern/ModularCore
+
+unix:!symbian {
+	maemo5 {
+		target.path = /opt/usr/bin
+	} else {
+		target.path = /usr/bin
+	}
+	INSTALLS += target
+}

@@ -39,3 +39,12 @@ else:unix: LIBS += -L$$OUT_PWD/../extern/GenericUI/curses/ -lGenericNCursesUI
 
 INCLUDEPATH += $$PWD/../extern/GenericUI/curses
 DEPENDPATH += $$PWD/../extern/GenericUI/curses
+
+unix:!symbian {
+	maemo5 {
+		target.path = /opt/usr/bin
+	} else {
+		target.path = /usr/bin
+	}
+	INSTALLS += target
+}
