@@ -35,7 +35,7 @@ public:
         CursesAction* action = new CursesAction("_Drop to Shell", &_coordinator);
         connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
         action = new CursesAction("Drop to _Root Shell", &_coordinator);
-                connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
+                connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()));
         _coordinator.addSeparator();
         new CursesAction("Connect to Server", &_coordinator);
         action = new CursesAction("E_xit", &_coordinator);
@@ -136,6 +136,7 @@ protected:
 
 protected slots:
     void dropToShell();
+    void dropToRootShell();
 
 private:
     QTimer _blinkTimer;
