@@ -49,8 +49,16 @@ public:
         connect(action, SIGNAL(activated()), this, SLOT(dropToShell()));
         action = new CursesAction("Drop to _Root Shell", &_coordinator);
                 connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()));
+
         _coordinator.addSeparator();
-        new CursesAction("Connect to Server", &_coordinator);
+
+        action = new CursesAction("Connect to...", &_coordinator);
+        action->disable();
+        action = new CursesAction("Disconnect", &_coordinator);
+        action->disable();
+
+        _coordinator.addSeparator();
+
         action = new CursesAction("E_xit", &_coordinator);
         connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
@@ -67,6 +75,7 @@ public:
         new CursesAction("Source", &_help);
         new CursesAction("Donate", &_help);
         _help.fitToContent();
+        _help.disable();
 
         _coordinator.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
