@@ -120,8 +120,22 @@ public slots:
             _blinkTimer.start();
             nextMessage = _statusQueue.takeFirst();
             _statusBar.setAttr(CursesLabel::Attr(CursesLabel::Bold | CursesLabel::Standout));
-        } else if(dateTime.time().second() % 30 == 0)
-            nextMessage = QString("%1 V%2").arg(QCoreApplication::instance()->applicationName()).arg(QCoreApplication::instance()->applicationVersion());
+        } else if(dateTime.time().second() % 15 == 0) {
+            if(dateTime.time().second() == 0)
+                nextMessage = QString("%1 V%2").arg(QCoreApplication::instance()->applicationName()).arg(QCoreApplication::instance()->applicationVersion());
+            else {
+                QFile f("/proc/loadavg");
+                if(f.open(QFile::ReadOnly)) {
+                    QString loadAvg = QString::fromUtf8(f.readAll());
+
+                    int index = loadAvg.indexOf(' ');
+                    index = loadAvg.indexOf(' ', index+1);
+                    index = loadAvg.indexOf(' ', index+1);
+
+                    nextMessage = QString("Load: %1").arg(loadAvg.mid(0, index));
+                }
+            }
+        }
 
         if(!nextMessage.isEmpty()) {
             _updateDateTime.stop(); // Skip 1.5 seconds, wait 1 more

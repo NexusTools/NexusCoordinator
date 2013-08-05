@@ -5,8 +5,8 @@ TEMPLATE = subdirs
 SUBDIRS +=  lib \
 	modules \
 	services \
-	daemon \
-    shell
+	daemon
 
-!CONFIG(NOCONSOLE):packagesExist(ncurses): SUBDIRS += console
+
+!CONFIG(NOCONSOLE)|!CONFIG(NOSHELL): SUBDIRS += console shell
 !CONFIG(NOGUI):packagesExist(QtGui): SUBDIRS += gui
