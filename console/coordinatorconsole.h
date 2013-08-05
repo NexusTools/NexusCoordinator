@@ -19,6 +19,16 @@ inline QString readHostname() {
     return "Unknown";
 }
 
+inline QStringList getLoginMessages() {
+    QStringList messages;
+    messages << QString("Logged in as %1").arg(getenv("USER"));
+    char* client = getenv("SSH_CLIENT");
+    if(client)
+        messages << QString("Logged in via %1").arg(client);
+
+    return messages;
+}
+
 class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
@@ -106,15 +116,14 @@ public slots:
         QDateTime dateTime = QDateTime::currentDateTime();
         QString nextMessage;
 
-        static bool showOnce = true;
+        static QStringList loginMessages(getLoginMessages());
 
         int timeout = 1500;
         _blinkTimer.stop();
         _statusBar.setAttr(CursesLabel::Dim);
-        if(showOnce) {
-            nextMessage = QString("Logged in as %1").arg(getenv("USER"));
-            timeout += 3000;
-            showOnce = false;
+        if(!loginMessages.isEmpty()) {
+            nextMessage = loginMessages.takeFirst();
+            timeout += 1500;
         } else if(!_statusQueue.isEmpty()) {
             timeout += 1500;
             _blinkTimer.start();
