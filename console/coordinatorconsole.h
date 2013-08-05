@@ -12,6 +12,8 @@
 #include <QTime>
 #include <QFile>
 
+#define SCREEN_DIR "/var/run/screen"
+
 inline QString readHostname() {
     QFile f("/etc/hostname");
     if(f.open(QFile::ReadOnly))
