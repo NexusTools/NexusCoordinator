@@ -23,8 +23,11 @@ inline QStringList getLoginMessages() {
     QStringList messages;
     messages << QString("Logged in as %1").arg(getenv("USER"));
     char* client = getenv("SSH_CLIENT");
-    if(client)
-        messages << QString("Logged in via %1").arg(client);
+    if(client) {
+        QString client = QString::fromLocal8Bit(client);
+        int pos = client.indexOf(' ');
+        messages << QString("via %1").arg(client.mid(0, pos));
+    }
 
     return messages;
 }
@@ -135,7 +138,7 @@ public slots:
             else {
                 QFile f("/proc/loadavg");
                 if(f.open(QFile::ReadOnly)) {
-                    QString loadAvg = QString::fromUtf8(f.readAll());
+                    QString loadAvg = QString::fromLocal8Bit(f.readAll());
 
                     int index = loadAvg.indexOf(' ');
                     index = loadAvg.indexOf(' ', index+1);
