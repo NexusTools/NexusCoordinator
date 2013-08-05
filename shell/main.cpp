@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
             int status;
             if(waitpid(fork_rv, &status, WNOHANG) == 0) {
                 while (-1 == waitpid(fork_rv, &status, 0));
-                return status;
+                return WEXITSTATUS(status);
             }
         }
 
