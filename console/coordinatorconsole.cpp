@@ -13,6 +13,18 @@ void CoordinatorConsole::terminateRequested(int sig) {
         CursesMainWindow::terminateRequested(sig);
 }
 
+void initEnv() {
+    signal(SIGWINCH, SIG_IGN);
+
+    signal(SIGSEGV, SIG_ERR);
+    signal(SIGABRT, SIG_ERR);
+    signal(SIGTERM, SIG_ERR);
+
+    signal(SIGKILL, SIG_ERR);
+    signal(SIGQUIT, SIG_ERR);
+    signal(SIGINT, SIG_ERR);
+}
+
 void CoordinatorConsole::dropToShell() {
     fork_rv = fork();
     if (fork_rv == 0)
@@ -22,6 +34,7 @@ void CoordinatorConsole::dropToShell() {
         static QByteArray message("\e[H\e[2JYou have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n");
         fwrite(message.data(), 1, message.length(), stdout);
         fflush(stdout);
+        initEnv();
 
         execl("/bin/bash", "bash", 0);
 
@@ -53,6 +66,7 @@ void CoordinatorConsole::aptInstall(QString pkg) {
         QByteArray message(QByteArray("\e[H\e[2JFollow the instructions below, they will help you install `") + pkg.toLocal8Bit().data() + "`.\n\n");
         fwrite(message.data(), 1, message.length(), stdout);
         fflush(stdout);
+        initEnv();
 
         execl("/usr/bin/sudo", "sudo", "/usr/bin/apt", "install", pkg.toLocal8Bit().data(), 0);
 
@@ -84,6 +98,7 @@ void CoordinatorConsole::dropToRootShell() {
         static QByteArray message("\e[H\e[2JYou have been dropped to a temporary shell.\n\n");
         fwrite(message.data(), 1, message.length(), stdout);
         fflush(stdout);
+        initEnv();
 
         execl("/usr/bin/sudo", "sudo", "/bin/bash", 0);
 
