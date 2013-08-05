@@ -22,9 +22,9 @@ inline QString readHostname() {
 inline QStringList getLoginMessages() {
     QStringList messages;
     messages << QString("Logged in as %1").arg(getenv("USER"));
-    char* client = getenv("SSH_CLIENT");
-    if(client) {
-        QString client = QString::fromLocal8Bit(client);
+    char* clientStr = getenv("SSH_CLIENT");
+    if(clientStr) {
+        QString client = QString::fromLocal8Bit(clientStr);
         int pos = client.indexOf(' ');
         messages << QString("via %1").arg(client.mid(0, pos));
     }
