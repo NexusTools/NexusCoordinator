@@ -153,6 +153,10 @@ void CoordinatorConsole::dropToRootShell() {
     startShell(QStringList() << "sudo" << "bash", "\e[H\e[2JYou have been dropped to a temporary shell.\n\n");
 }
 
+void CoordinatorConsole::editCronTab() {
+    startShell(QStringList() << "crontab" << "-e");
+}
+
 
 void CoordinatorConsole::runVim(QString file){
     QStringList args;

@@ -74,11 +74,12 @@ public:
 
         new CursesAction("Add User", &_system);
         new CursesAction("Add Group", &_system);
-        new CursesAction("Edit Cron Tab", &_system);
+        action = new CursesAction("Edit Cron Tab", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(editCronTab()));
 
         _system.addSeparator();
 
-        action = new CursesAction("Install _Updates (0)", &_system);
+        action = new CursesAction("Install _Updates", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateUpgrade()));
         action = new CursesAction("Agressive Upgrade", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateDistUpgrade()));
@@ -217,6 +218,7 @@ protected slots:
     void sudoReboot();
     void dropToShell();
     void dropToRootShell();
+    void editCronTab();
 
 
     void runVim(QString file =QString());
