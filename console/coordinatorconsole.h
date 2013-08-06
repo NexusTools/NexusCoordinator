@@ -76,8 +76,10 @@ public:
 
         _system.addSeparator();
 
-        action = new CursesAction("_Update (0)", &_system);
+        action = new CursesAction("Install _Updates (0)", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateUpgrade()));
+        action = new CursesAction("Agressive Upgrade", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(aptUpdateDistUpgrade()));
         action = new CursesAction("Restart", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(sudoReboot()));
 
@@ -187,6 +189,7 @@ protected slots:
     }
     void aptInstall(QString package);
     void aptUpdateUpgrade();
+    void aptUpdateDistUpgrade();
 
     void sudoReboot();
     void dropToShell();

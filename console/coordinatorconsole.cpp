@@ -108,6 +108,10 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
 }
 
 void CoordinatorConsole::aptUpdateUpgrade() {
+    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get upgrade", "\e[H\e[2JFollow the instructions below.\n\n");
+}
+
+void CoordinatorConsole::aptUpdateDistUpgrade() {
     startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get dist-upgrade", "\e[H\e[2JFollow the instructions below.\n\n");
 }
 
