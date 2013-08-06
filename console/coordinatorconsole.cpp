@@ -83,10 +83,11 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     {
         endwin();
 
-        if(!message.isEmpty()) {
-            fwrite(message.data(), 1, message.length(), stdout);
-            fflush(stdout);
-        }
+        if(message.isEmpty())
+            message = QString("Launching `%1`").arg(args.join(" ")).toLocal8Bit();
+        printf("\e[H\e[2J");
+        fwrite(message.data(), 1, message.length(), stdout);
+        fflush(stdout);
         initEnv();
 
         char* rawPath = new char[binaryPath.size()+1];
@@ -130,27 +131,27 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
 }
 
 void CoordinatorConsole::aptUpdateUpgrade() {
-    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get upgrade", "\e[H\e[2JFollow the instructions below.\n\n");
+    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get upgrade", "Follow the instructions below.\n\n");
 }
 
 void CoordinatorConsole::aptUpdateDistUpgrade() {
-    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get dist-upgrade", "\e[H\e[2JFollow the instructions below.\n\n");
+    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get dist-upgrade", "Follow the instructions below.\n\n");
 }
 
 void CoordinatorConsole::aptInstall(QString pkg) {
-    startShell(QStringList() << "apt-get" << "install" << pkg, "\e[H\e[2JFollow the instructions below, they will help you install the required software.\n\n");
+    startShell(QStringList() << "apt-get" << "install" << pkg, "Follow the instructions below, they will help you install the required software.\n\n");
 }
 
 void CoordinatorConsole::sudoReboot() {
-    startShell(QStringList() << "sudo" << "reboot", "\e[H\e[2JEnter your password to reboot.\n\n");
+    startShell(QStringList() << "sudo" << "reboot", "Enter your password to reboot.\n\n");
 }
 
 void CoordinatorConsole::dropToShell() {
-    startShell(QStringList() << "bash", "\e[H\e[2JYou have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n");
+    startShell(QStringList() << "bash", "You have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n");
 }
 
 void CoordinatorConsole::dropToRootShell() {
-    startShell(QStringList() << "sudo" << "bash", "\e[H\e[2JYou have been dropped to a temporary shell.\n\n");
+    startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n");
 }
 
 void CoordinatorConsole::editCronTab() {
