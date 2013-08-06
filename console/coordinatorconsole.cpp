@@ -2,11 +2,17 @@
 
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #include <QDir>
 
 #define SCREEN_DIR "/var/run/screen"
+
+void CoordinatorConsole::killChild() {
+    kill(child_pid, SIGTERM);
+    kill(child_pid, SIGKILL);
+}
 
 void CoordinatorConsole::rescanAvailableFunctions() {
     // Rescan Launchers
@@ -45,7 +51,7 @@ void CoordinatorConsole::rescanAvailableFunctions() {
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {
-    if(fork_rv > 0)
+    if(child_pid > 0)
         _terminated = true;
     else
         CursesMainWindow::terminateRequested(sig);
@@ -54,11 +60,9 @@ void CoordinatorConsole::terminateRequested(int sig) {
 void initEnv() {
     signal(SIGWINCH, SIG_IGN);
 
+    signal(SIGHUP, SIG_ERR);
     signal(SIGSEGV, SIG_ERR);
     signal(SIGABRT, SIG_ERR);
-    signal(SIGTERM, SIG_ERR);
-
-    signal(SIGKILL, SIG_ERR);
     signal(SIGQUIT, SIG_ERR);
     signal(SIGINT, SIG_ERR);
 }
@@ -78,8 +82,8 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
         binaryPath = binaryInfo.filePath().toLocal8Bit();
     }
 
-    fork_rv = fork();
-    if (fork_rv == 0)
+    child_pid = fork();
+    if (child_pid == 0)
     {
         endwin();
 
@@ -104,7 +108,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
         execv(rawPath, rawArgs);
         _exit(1);
     }
-    else if (fork_rv == -1)
+    else if (child_pid == -1)
     {
         _statusQueue << QString("Failed to launch `%1`").arg(args.join(" "));
         beep();
@@ -115,7 +119,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     sleep(2);
 
     int status;
-    while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
+    while (child_pid > 0 && -1 == waitpid(child_pid, &status, 0));
     if(status != 0) {
         if(_terminated)
             _statusQueue << QString("Process `%1` terminated").arg(args.join(" "));
@@ -123,7 +127,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
             _statusQueue << QString("Process `%1` crashed").arg(args.join(" "));
         beep();
     }
-    fork_rv=0;
+    child_pid=0;
 
     rescanAvailableFunctions();
     titleChanged();

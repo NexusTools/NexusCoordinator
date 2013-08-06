@@ -116,7 +116,7 @@ public:
 
         updateStatusMessage();
         fixLayoutImpl();
-        fork_rv = 0;
+        child_pid = 0;
     }
 
     inline void drawImpl() {
@@ -197,6 +197,7 @@ public slots:
     }
 
     virtual void terminateRequested(int);
+    void killChild();
 
 protected:
     inline virtual void fixLayoutImpl() {
@@ -235,7 +236,7 @@ protected:
     void startShell(QStringList, QByteArray ="");
 
 private:
-    int fork_rv;
+    int child_pid;
     bool _terminated;
 
     QTimer _blinkTimer;

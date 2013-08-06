@@ -1,7 +1,15 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
+
+int child_pid = 0;
+
+void kill_child() {
+    kill(child_pid, SIGTERM);
+    kill(child_pid, SIGKILL);
+}
 
 int main(int argc, char *argv[])
 {
@@ -9,20 +17,23 @@ int main(int argc, char *argv[])
         printf("Starting NexusCoordinator ... ");
         fflush(stdout);
 
-        int fork_rv = fork();
-        if (fork_rv == 0)
+        child_pid = fork();
+        if (child_pid == 0)
         {
             execl("/usr/bin/NexusCoordinatorConsole", "NexusCoordinatorConsole", "--shell", 0);
             _exit(-1);
-        } else if(fork_rv > 0) {
+        } else if(child_pid > 0) {
             sleep(2);
 
             int status;
-            if(waitpid(fork_rv, &status, WNOHANG) == 0) {
-                while (-1 == waitpid(fork_rv, &status, 0));
+            if(waitpid(child_pid, &status, WNOHANG) == 0) {
+                atexit(kill_child);
+                while (-1 == waitpid(child_pid, &status, 0));
                 return WEXITSTATUS(status);
             }
-        }
+            kill_child();
+        } else
+            child_pid = 0;
 
         printf("failed to start.\nDropping to shell...\n\n");
         fflush(stdout);
