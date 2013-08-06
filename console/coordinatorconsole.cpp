@@ -92,11 +92,18 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     {
         endwin();
 
-        if(message.isEmpty())
-            message = QString("Launching `%1`").arg(args.join(" ")).toLocal8Bit();
         printf("\e[H\e[2J");
-        fwrite(message.data(), 1, message.length(), stdout);
+
+        QByteArray launchMsg = QString("Launching `%1` ...\n").arg(args.join(" ")).toLocal8Bit();
+        fwrite(launchMsg.data(), 1, launchMsg.length(), stdout);
         fflush(stdout);
+        if(!message.isEmpty()) {
+            usleep(300000);
+            printf("\e[H\e[2J");
+            fwrite(message.data(), 1, message.length(), stdout);
+            fflush(stdout);
+        } else
+            usleep(600000);
         initEnv();
 
         char* rawPath = new char[binaryPath.size()+1];
@@ -111,6 +118,10 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
         rawArgs[i] = 0;
 
         execv(rawPath, rawArgs);
+        printf("\n\nFailed to launch...");
+        fflush(stdout);
+        sleep(1);
+
         _exit(1);
     }
     else if (child_pid == -1)
@@ -118,12 +129,6 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
         _statusQueue << QString("Failed to launch `%1`").arg(args.join(" "));
         beep();
         return;
-    }
-
-    static bool atExitHooked = false;
-    if(!atExitHooked) {
-        atexit(killChildAtExit);
-        atExitHooked = true;
     }
 
     endwin();
