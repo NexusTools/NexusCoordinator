@@ -9,6 +9,10 @@
 
 #define SCREEN_DIR "/var/run/screen"
 
+void killChildAtExit() {
+    ((CoordinatorConsole*)CursesMainWindow::current())->killChild();
+}
+
 void CoordinatorConsole::killChild() {
     kill(child_pid, SIGTERM);
     kill(child_pid, SIGKILL);
@@ -58,6 +62,12 @@ void CoordinatorConsole::terminateRequested(int sig) {
 }
 
 void initEnv() {
+    static bool childExitHooked = false;
+    if(!childExitHooked) {
+        atexit(killChildAtExit);
+        childExitHooked = true;
+    }
+
     signal(SIGWINCH, SIG_IGN);
 
     signal(SIGHUP, SIG_ERR);
