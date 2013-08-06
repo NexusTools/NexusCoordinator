@@ -37,7 +37,7 @@ class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
 public:
-    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _help("_Help", this),
+    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
         createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), _statusBar(this) {
         _updateDateTime.setInterval(1000);
         connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
@@ -70,8 +70,19 @@ public:
         new CursesAction("Source", &_help);
         new CursesAction("Donate", &_help);
 
+
+        new CursesAction("Add User", &_system);
+        new CursesAction("Add Group", &_system);
+
+        _system.addSeparator();
+
+        new CursesAction("_Update (0)", &_system);
+        new CursesAction("Restart", &_system);
+
+
         _coordinator.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
+        _system.action()->setParent(&_menuBar);
         _help.action()->setParent(&_menuBar);
 
         connect(&installScreen, SIGNAL(activated()), this, SLOT(installScreenPkg()));
@@ -191,6 +202,7 @@ private:
     CursesMenuBar _menuBar;
     CursesMenu _coordinator;
     CursesMenu _screens;
+    CursesMenu _system;
     CursesMenu _help;
 
     CursesAction createScreen;
