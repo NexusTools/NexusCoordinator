@@ -96,9 +96,9 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
     if(status != 0) {
         if(_terminated)
-            _statusQueue << QString("Process `%1` terminated").arg(args.join(' '));
+            _statusQueue << QString("Process `%1` terminated").arg(args.join(" "));
         else
-            _statusQueue << QString("Process `%1` crashed").arg(args.join(' '));
+            _statusQueue << QString("Process `%1` crashed").arg(args.join(" "));
         beep();
     }
     fork_rv=0;
