@@ -96,9 +96,9 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
     if(status != 0) {
         if(_terminated)
-            _statusQueue << QString("Process `%1` terminated").arg(binary);
+            _statusQueue << QString("Process `%1` terminated").arg(args.join(' '));
         else
-            _statusQueue << QString("Process `%1` crashed").arg(binary);
+            _statusQueue << QString("Process `%1` crashed").arg(args.join(' '));
         beep();
     }
     fork_rv=0;
@@ -107,8 +107,16 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     refresh();
 }
 
+void CoordinatorConsole::aptUpdateUpgrade() {
+    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get upgrade", "\e[H\e[2JFollow the instructions below.\n\n");
+}
+
 void CoordinatorConsole::aptInstall(QString pkg) {
     startShell(QStringList() << "apt-get" << "install" << pkg, "\e[H\e[2JFollow the instructions below, they will help you install the required software.\n\n");
+}
+
+void CoordinatorConsole::sudoReboot() {
+    startShell(QStringList() << "sudo" << "reboot", "\e[H\e[2JEnter your password to reboot.\n\n");
 }
 
 void CoordinatorConsole::dropToShell() {

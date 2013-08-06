@@ -76,9 +76,10 @@ public:
 
         _system.addSeparator();
 
-        new CursesAction("_Update (0)", &_system);
-        new CursesAction("Restart", &_system);
-
+        action = new CursesAction("_Update (0)", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(aptUpdateUpgrade()));
+        action = new CursesAction("Restart", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(sudoReboot()));
 
         _coordinator.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
@@ -185,7 +186,9 @@ protected slots:
         aptInstall("screen");
     }
     void aptInstall(QString package);
+    void aptUpdateUpgrade();
 
+    void sudoReboot();
     void dropToShell();
     void dropToRootShell();
 
