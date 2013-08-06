@@ -11,6 +11,15 @@ void kill_child() {
     kill(child_pid, SIGKILL);
 }
 
+void pass_signal(int sig) {
+    if(child_pid > 0)
+        kill(child_pid, sig);
+    else {
+        fprintf(stderr, "Exiting with signal %i", sig);
+        exit(sig);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if(argc == 1) {
@@ -27,6 +36,14 @@ int main(int argc, char *argv[])
 
             int status;
             if(waitpid(child_pid, &status, WNOHANG) == 0) {
+                signal(SIGHUP, pass_signal);
+                signal(SIGSEGV, pass_signal);
+                signal(SIGABRT, pass_signal);
+                signal(SIGQUIT, pass_signal);
+                signal(SIGTERM, pass_signal);
+                signal(SIGKILL, pass_signal);
+                signal(SIGINT, pass_signal);
+
                 atexit(kill_child);
                 while (-1 == waitpid(child_pid, &status, 0));
                 return WEXITSTATUS(status);
