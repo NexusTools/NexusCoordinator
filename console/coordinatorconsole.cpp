@@ -55,26 +55,21 @@ void CoordinatorConsole::rescanAvailableFunctions() {
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {
-    if(child_pid > 0)
+    if(child_pid > 0) {
         _terminated = true;
-    else
+        kill(child_pid, sig);
+    } else
         CursesMainWindow::terminateRequested(sig);
 }
 
 void initEnv() {
-    static bool childExitHooked = false;
-    if(!childExitHooked) {
-        atexit(killChildAtExit);
-        childExitHooked = true;
-    }
-
-    signal(SIGWINCH, SIG_IGN);
-
     signal(SIGHUP, SIG_ERR);
     signal(SIGSEGV, SIG_ERR);
     signal(SIGABRT, SIG_ERR);
     signal(SIGQUIT, SIG_ERR);
     signal(SIGINT, SIG_ERR);
+
+    signal(SIGWINCH, SIG_IGN);
 }
 
 void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
@@ -123,6 +118,12 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
         _statusQueue << QString("Failed to launch `%1`").arg(args.join(" "));
         beep();
         return;
+    }
+
+    static bool atExitHooked = false;
+    if(!atExitHooked) {
+        atexit(killChildAtExit);
+        atExitHooked = true;
     }
 
     endwin();
