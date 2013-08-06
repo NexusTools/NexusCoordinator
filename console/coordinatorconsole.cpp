@@ -44,20 +44,42 @@ void initEnv() {
     signal(SIGINT, SIG_ERR);
 }
 
-void CoordinatorConsole::dropToShell() {
+void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     _terminated = false;
+
+    QByteArray binaryPath;
+    QString binary = args.first();
+    {
+        QFileInfo binaryInfo(QString("bin:%1").arg(binary));
+        if(!binaryInfo.exists()) {
+            _statusQueue << QString("Unable to locate `%1`").arg(binary);
+            beep();
+            return;
+        }
+        binaryPath = binaryInfo.filePath().toLocal8Bit();
+    }
 
     fork_rv = fork();
     if (fork_rv == 0)
     {
         endwin();
 
-        static QByteArray message("\e[H\e[2JYou have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n");
         fwrite(message.data(), 1, message.length(), stdout);
         fflush(stdout);
         initEnv();
 
-        execl("/bin/bash", "bash", 0);
+        char* rawPath = new char[binaryPath.size()+1];
+        strcpy(rawPath, binaryPath.data());
+
+        int i = 0;
+        char** rawArgs = new char*[args.length()+1];
+        for(; i<args.length(); i++) {
+            rawArgs[i] = new char[args[i].length()+1];
+            strcpy(rawArgs[i], args[i].toLocal8Bit().data());
+        }
+        rawArgs[i] = 0;
+
+        execv(rawPath, rawArgs);
 
         _exit(1);
     }
@@ -74,9 +96,9 @@ void CoordinatorConsole::dropToShell() {
     while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
     if(status != 0) {
         if(_terminated)
-            _statusQueue << "Process terminated";
+            _statusQueue << QString("Process `%1` terminated").arg(binary);
         else
-            _statusQueue << "Process crashed";
+            _statusQueue << QString("Process `%1` crashed").arg(binary);
         beep();
     }
     fork_rv=0;
@@ -86,83 +108,14 @@ void CoordinatorConsole::dropToShell() {
 }
 
 void CoordinatorConsole::aptInstall(QString pkg) {
-    _terminated = false;
-
-    fork_rv = fork();
-    if (fork_rv == 0)
-    {
-        endwin();
-
-        QByteArray message(QByteArray("\e[H\e[2JFollow the instructions below, they will help you install `") + pkg.toLocal8Bit().data() + "`.\n\n");
-        fwrite(message.data(), 1, message.length(), stdout);
-        fflush(stdout);
-        initEnv();
-
-        execl("/usr/bin/sudo", "sudo", "/usr/bin/apt-get", "install", pkg.toLocal8Bit().data(), 0);
-        _exit(1);
-    }
-    else if (fork_rv == -1)
-    {
-        // TODO: show error message
-        return;
-    }
-
-    endwin();
-
-    int status;
-    while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
-    if(status != 0) {
-        if(_terminated)
-            _statusQueue << "Process terminated";
-        else
-            _statusQueue << "Process crashed";
-        beep();
-    }
-    fork_rv=0;
-
-    titleChanged();
-    cursesDirtyMainWindow();
-    rescanScreens();
+    startShell(QStringList() << "apt-get" << "install" << pkg, "\e[H\e[2JFollow the instructions below, they will help you install the required software.\n\n");
 }
 
+void CoordinatorConsole::dropToShell() {
+    startShell(QStringList() << "bash", "\e[H\e[2JYou have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n");
+}
 
 void CoordinatorConsole::dropToRootShell() {
-    _terminated = false;
-
-    fork_rv = fork();
-    if (fork_rv == 0)
-    {
-        endwin();
-
-        static QByteArray message("\e[H\e[2JYou have been dropped to a temporary shell.\n\n");
-        fwrite(message.data(), 1, message.length(), stdout);
-        fflush(stdout);
-        initEnv();
-
-        execl("/usr/bin/sudo", "sudo", "/bin/bash", 0);
-
-        _exit(1);
-    }
-    else if (fork_rv == -1)
-    {
-        // TODO: show error message
-        return;
-    }
-
-    endwin();
-
-    int status;
-    while (fork_rv > 0 && -1 == waitpid(fork_rv, &status, 0));
-    if(status != 0) {
-        if(_terminated)
-            _statusQueue << "Process terminated";
-        else
-            _statusQueue << "Process crashed";
-        beep();
-    }
-    fork_rv=0;
-
-    titleChanged();
-    cursesDirtyMainWindow();
+    startShell(QStringList() << "sudo" << "bash", "\e[H\e[2JYou have been dropped to a temporary shell.\n\n");
 }
 

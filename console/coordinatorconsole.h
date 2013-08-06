@@ -191,6 +191,9 @@ protected slots:
 
     void rescanScreens();
 
+protected:
+    void startShell(QStringList, QByteArray);
+
 private:
     int fork_rv;
     bool _terminated;
