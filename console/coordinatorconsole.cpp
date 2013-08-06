@@ -77,6 +77,7 @@ void CoordinatorConsole::dropToShell() {
             _statusQueue << "Process terminated";
         else
             _statusQueue << "Process crashed";
+        beep();
     }
     fork_rv=0;
 
@@ -115,6 +116,7 @@ void CoordinatorConsole::aptInstall(QString pkg) {
             _statusQueue << "Process terminated";
         else
             _statusQueue << "Process crashed";
+        beep();
     }
     fork_rv=0;
 
@@ -156,6 +158,7 @@ void CoordinatorConsole::dropToRootShell() {
             _statusQueue << "Process terminated";
         else
             _statusQueue << "Process crashed";
+        beep();
     }
     fork_rv=0;
 

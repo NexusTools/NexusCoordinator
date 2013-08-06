@@ -128,6 +128,7 @@ public slots:
             nextMessage = loginMessages.takeFirst();
             timeout += 1500;
         } else if(!_statusQueue.isEmpty()) {
+            flash();
             timeout += 1500;
             _blinkTimer.start();
             nextMessage = _statusQueue.takeFirst();
