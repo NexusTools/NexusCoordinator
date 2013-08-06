@@ -143,6 +143,8 @@ public:
         }
     }
 
+    static QString quoteArg(QString arg);
+
 public slots:
     inline void notifyClicked() {
         _statusQueue << "I was clicked!";
@@ -233,7 +235,7 @@ protected slots:
     void rescanAvailableFunctions();
 
 protected:
-    void startShell(QStringList, QByteArray ="");
+    void startShell(QStringList, QByteArray startMsg ="", QByteArray finMsg ="");
 
 private:
     int child_pid;

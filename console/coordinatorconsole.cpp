@@ -72,11 +72,48 @@ void initEnv() {
     signal(SIGWINCH, SIG_IGN);
 }
 
-void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
+QString CoordinatorConsole::quoteArg(QString arg) {
+    QString ar;
+    QString arS;
+    bool space = false;
+    bool needQuote = false;
+    foreach(QChar c, arg) {
+        if(c.isSpace())
+            space = true;
+        else if(!c.isLetterOrNumber() && c != ';' && c != '-') {
+            needQuote = true;
+            arS.clear();
+            ar += '\\';
+        }
+
+        ar += c;
+        if(!needQuote) {
+            if(c.isSpace())
+                arS += '\\';
+            arS += c;
+        }
+    }
+
+    if(needQuote)
+        return QString("\"%1\"").arg(ar);
+    else if(space)
+        return arS;
+
+    return ar;
+}
+
+void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByteArray finMsg) {
     _terminated = false;
 
+    QString quotedCmd;
     QByteArray binaryPath;
     QString binary = args.first();
+    foreach(QString arg, args) {
+        if(!quotedCmd.isEmpty())
+            quotedCmd += ' ';
+
+        quotedCmd += quoteArg(arg);
+    }
     {
         QFileInfo binaryInfo(QString("bin:%1").arg(binary));
         if(!binaryInfo.exists()) {
@@ -92,15 +129,17 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     {
         endwin();
 
-        printf("\e[H\e[2J");
+        printf("\033]0;%s\007\e[H\e[2J", qPrintable(quotedCmd));
+        fflush(stdout);
 
-        QByteArray launchMsg = QString("Launching `%1` ...\n").arg(args.join(" ")).toLocal8Bit();
+        QByteArray launchMsg = QString("Launching `%1` ...\n").arg(quotedCmd).toLocal8Bit();
         fwrite(launchMsg.data(), 1, launchMsg.length(), stdout);
         fflush(stdout);
-        if(!message.isEmpty()) {
+
+        if(!startMsg.isEmpty()) {
             usleep(300000);
             printf("\e[H\e[2J");
-            fwrite(message.data(), 1, message.length(), stdout);
+            fwrite(startMsg.data(), 1, startMsg.length(), stdout);
             fflush(stdout);
         } else
             usleep(600000);
@@ -126,7 +165,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     }
     else if (child_pid == -1)
     {
-        _statusQueue << QString("Failed to launch `%1`").arg(args.join(" "));
+        _statusQueue << QString("Failed to launch `%1`").arg(quotedCmd);
         beep();
         return;
     }
@@ -138,9 +177,9 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     while (child_pid > 0 && -1 == waitpid(child_pid, &status, 0));
     if(status != 0) {
         if(_terminated)
-            _statusQueue << QString("Process `%1` terminated").arg(args.join(" "));
+            _statusQueue << QString("Process `%1` terminated").arg(quotedCmd);
         else
-            _statusQueue << QString("Process `%1` crashed").arg(args.join(" "));
+            _statusQueue << QString("Process `%1` crashed").arg(quotedCmd);
         beep();
     }
     child_pid=0;
