@@ -19,10 +19,9 @@ void CoordinatorConsole::rescanAvailableFunctions() {
     bool w = QFileInfo("bin:w3m").exists();
     bool e = QFileInfo("bin:elinks").exists();
     bool l = QFileInfo("bin:lynx").exists();
-
     launchW3M.setVisible(w);
     launchELinks.setVisible(e || (!e && !w && !l));
-    launchELinks.setText(e ? "Install ELinks" : "ELinks");
+    launchELinks.setText(e ? "ELinks" : "Install ELinks");
     launchLynx.setVisible(l);
 
     _launch.fitToContent();
