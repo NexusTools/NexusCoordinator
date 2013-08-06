@@ -102,7 +102,7 @@ QString CoordinatorConsole::quoteArg(QString arg) {
     return ar;
 }
 
-void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByteArray finMsg) {
+void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QString finMsg) {
     _terminated = false;
 
     QString quotedCmd;
@@ -177,11 +177,14 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
     while (child_pid > 0 && -1 == waitpid(child_pid, &status, 0));
     if(status != 0) {
         if(_terminated)
-            _statusQueue << QString("Process `%1` terminated").arg(quotedCmd);
+            _statusQueue << QString("`%1` terminated").arg(quotedCmd);
         else
-            _statusQueue << QString("Process `%1` crashed").arg(quotedCmd);
+            _statusQueue << QString("`%1` crashed").arg(quotedCmd);
         beep();
-    }
+    } else if(!finMsg.isEmpty())
+        _statusQueue << finMsg;
+    else
+        _statusQueue << QString("`%1` exited").arg(quotedCmd);
     child_pid=0;
 
     rescanAvailableFunctions();

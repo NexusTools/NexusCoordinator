@@ -235,7 +235,7 @@ protected slots:
     void rescanAvailableFunctions();
 
 protected:
-    void startShell(QStringList, QByteArray startMsg ="", QByteArray finMsg ="");
+    void startShell(QStringList, QByteArray startMsg ="", QString finMsg ="");
 
 private:
     int child_pid;
