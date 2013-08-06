@@ -9,6 +9,7 @@
 #include <QCoreApplication>
 #include <QStringList>
 #include <QDateTime>
+#include <QFileInfo>
 #include <QTimer>
 #include <QTime>
 #include <QFile>
@@ -37,8 +38,11 @@ class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
 public:
-    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this), _coordinator("Coord_inator", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
-        createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), _statusBar(this) {
+    inline explicit CoordinatorConsole() : CursesMainWindow(QString("NexusCoordinator on %1").arg(readHostname())), _menuBar(this),
+                _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
+                launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
+                createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), _statusBar(this) {
+
         _updateDateTime.setInterval(1000);
         connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
         _updateDateTime.start();
@@ -64,15 +68,13 @@ public:
         action = new CursesAction("E_xit", &_coordinator);
         connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
-        new CursesAction("Contents", &_help);
-        new CursesAction("Credits", &_help);
-        new CursesAction("Website", &_help);
-        new CursesAction("Source", &_help);
-        new CursesAction("Donate", &_help);
+
+        rescanAvailableFunctions();
 
 
         new CursesAction("Add User", &_system);
         new CursesAction("Add Group", &_system);
+        new CursesAction("Edit Cron Tab", &_system);
 
         _system.addSeparator();
 
@@ -80,17 +82,37 @@ public:
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateUpgrade()));
         action = new CursesAction("Agressive Upgrade", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateDistUpgrade()));
+
+        _system.addSeparator();
+
         action = new CursesAction("Restart", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(sudoReboot()));
 
+
+        new CursesAction("Contents", &_help);
+        new CursesAction("Credits", &_help);
+        new CursesAction("Website", &_help);
+        new CursesAction("Source", &_help);
+        new CursesAction("Donate", &_help);
+
+
         _coordinator.action()->setParent(&_menuBar);
+        _launch.action()->setParent(&_menuBar);
         _screens.action()->setParent(&_menuBar);
         _system.action()->setParent(&_menuBar);
         _help.action()->setParent(&_menuBar);
 
+
+        connect(&launchVim, SIGNAL(activated()), this, SLOT(runVim()));
+        connect(&launchNano, SIGNAL(activated()), this, SLOT(runNano()));
+
+        connect(&launchLynx, SIGNAL(activated()), this, SLOT(runLynx()));
+        connect(&launchELinks, SIGNAL(activated()), this, SLOT(runELinks()));
+        connect(&launchW3M, SIGNAL(activated()), this, SLOT(runW3M()));
+
         connect(&installScreen, SIGNAL(activated()), this, SLOT(installScreenPkg()));
 
-        rescanScreens();
+
         updateStatusMessage();
         fixLayoutImpl();
         fork_rv = 0;
@@ -191,14 +213,24 @@ protected slots:
     void aptUpdateUpgrade();
     void aptUpdateDistUpgrade();
 
+
     void sudoReboot();
     void dropToShell();
     void dropToRootShell();
 
-    void rescanScreens();
+
+    void runVim(QString file =QString());
+    void runNano(QString file =QString());
+
+    void runELinks(QString url =QString());
+    void runLynx(QString url =QString());
+    void runW3M(QString url =QString());
+
+
+    void rescanAvailableFunctions();
 
 protected:
-    void startShell(QStringList, QByteArray);
+    void startShell(QStringList, QByteArray ="");
 
 private:
     int fork_rv;
@@ -208,11 +240,23 @@ private:
     QTimer _updateDateTime;
     QStringList _statusQueue;
 
+
     CursesMenuBar _menuBar;
+
     CursesMenu _coordinator;
+    CursesMenu _launch;
     CursesMenu _screens;
     CursesMenu _system;
     CursesMenu _help;
+
+
+    CursesAction launchVim;
+    CursesAction launchNano;
+
+    CursesAction launchW3M;
+    CursesAction launchELinks;
+    CursesAction launchLynx;
+
 
     CursesAction createScreen;
     CursesAction installScreen;

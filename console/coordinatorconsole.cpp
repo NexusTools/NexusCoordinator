@@ -8,7 +8,27 @@
 
 #define SCREEN_DIR "/var/run/screen"
 
-void CoordinatorConsole::rescanScreens() {
+void CoordinatorConsole::rescanAvailableFunctions() {
+    // Rescan Launchers
+    bool v = QFileInfo("bin:vim").exists();
+    bool n = QFileInfo("bin:nano").exists();
+    launchVim.setVisible(v);
+    launchNano.setVisible(n || (!n && !v));
+    launchNano.setText(n ? "Nano" : "Install Nano");
+
+    bool w = QFileInfo("bin:w3m").exists();
+    bool e = QFileInfo("bin:elinks").exists();
+    bool l = QFileInfo("bin:lynx").exists();
+
+    launchW3M.setVisible(w);
+    launchELinks.setVisible(e || (!e && !w && !l));
+    launchELinks.setText(e ? "Install ELinks" : "ELinks");
+    launchLynx.setVisible(l);
+
+    _launch.fitToContent();
+    _launch.markDirty();
+
+    // Rescan Screens
     QDir screenDir(SCREEN_DIR);
     if(screenDir.exists()) {
         screenListSeparator.show();
@@ -64,8 +84,10 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     {
         endwin();
 
-        fwrite(message.data(), 1, message.length(), stdout);
-        fflush(stdout);
+        if(!message.isEmpty()) {
+            fwrite(message.data(), 1, message.length(), stdout);
+            fflush(stdout);
+        }
         initEnv();
 
         char* rawPath = new char[binaryPath.size()+1];
@@ -80,12 +102,12 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
         rawArgs[i] = 0;
 
         execv(rawPath, rawArgs);
-
         _exit(1);
     }
     else if (fork_rv == -1)
     {
-        // TODO: show error message
+        _statusQueue << QString("Failed to launch `%1`").arg(args.join(" "));
+        beep();
         return;
     }
 
@@ -103,6 +125,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray message) {
     }
     fork_rv=0;
 
+    rescanAvailableFunctions();
     titleChanged();
     refresh();
 }
@@ -129,5 +152,59 @@ void CoordinatorConsole::dropToShell() {
 
 void CoordinatorConsole::dropToRootShell() {
     startShell(QStringList() << "sudo" << "bash", "\e[H\e[2JYou have been dropped to a temporary shell.\n\n");
+}
+
+
+void CoordinatorConsole::runVim(QString file){
+    QStringList args;
+    args << "vim";
+    if(!file.isEmpty())
+        args << file;
+
+    startShell(args);
+}
+
+void CoordinatorConsole::runNano(QString file){
+    if(launchNano.text() == "Install Nano") {
+        aptInstall("nano");
+        return;
+    }
+
+    QStringList args;
+    args << "nano";
+    if(!file.isEmpty())
+        args << file;
+
+    startShell(args);
+}
+
+void CoordinatorConsole::runELinks(QString url){
+    if(launchNano.text() == "Install ELinks") {
+        aptInstall("elinks");
+        return;
+    }
+
+    QStringList args;
+    args << "elinks";
+    if(!url.isEmpty())
+        args << url;
+
+    startShell(args);
+}
+void CoordinatorConsole::runLynx(QString url){
+    QStringList args;
+    args << "lynx";
+    if(!url.isEmpty())
+        args << url;
+
+    startShell(args);
+}
+void CoordinatorConsole::runW3M(QString url){
+    QStringList args;
+    args << "w3m";
+    if(!url.isEmpty())
+        args << url;
+
+    startShell(args);
 }
 
