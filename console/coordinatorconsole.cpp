@@ -140,8 +140,6 @@ void CoordinatorConsole::rescanAvailableFunctions() {
         createScreen.hide();
 
     }
-    _screens.fitToContent();
-    _screens.markDirty();
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {
@@ -293,7 +291,7 @@ void CoordinatorConsole::aptUpdateDistUpgrade() {
 }
 
 void CoordinatorConsole::aptInstall(QString pkg) {
-    startShell(QStringList() << "apt-get" << "install" << pkg, "Follow the instructions below, they will help you install the required software.\n\n");
+    startShell(QStringList() << "sudo" << "apt-get" << "install" << pkg, "Follow the instructions below, they will help you install the required software.\n\n");
 }
 
 void CoordinatorConsole::sudoReboot() {
