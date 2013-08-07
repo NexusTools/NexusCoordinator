@@ -17,7 +17,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())), _menuBar(this),
             _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
-            createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
+            installScreen("Install Screen", &_screens), createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
     _shellMode = shellMode;
     _updateDateTime.setInterval(1000);
@@ -46,7 +46,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     _coordinator.addSeparator();
 
     action = new CursesAction("E_xit", &_coordinator);
-    connect(action, SIGNAL(activated()), this, SLOT(exit()));
+    connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
 
     if(shellMode) {
@@ -112,8 +112,10 @@ void killChildAtExit() {
 }
 
 void CoordinatorConsole::killChild() {
-    kill(child_pid, SIGTERM);
-    kill(child_pid, SIGKILL);
+    if(child_pid > 0) {
+        kill(child_pid, SIGTERM);
+        kill(child_pid, SIGKILL);
+    }
 }
 
 void CoordinatorConsole::rescanAvailableFunctions() {
@@ -140,6 +142,7 @@ void CoordinatorConsole::rescanAvailableFunctions() {
     static char* user = getenv("USER");
     if(screenDir.exists()) {
         screenListSeparator.show();
+        manageOtherUser.show();
         installScreen.hide();
         createScreen.show();
 
@@ -183,6 +186,7 @@ void CoordinatorConsole::rescanAvailableFunctions() {
     } else {
         screenNoInstancesMessage.hide();
         screenListSeparator.hide();
+        manageOtherUser.hide();
         installScreen.show();
         createScreen.hide();
 
@@ -201,13 +205,16 @@ bool ScreenAction::processEvent(QEvent *e) {
     return CursesAction::processEvent(e);
 }
 
-void CoordinatorConsole::exit(int code) {
+void CoordinatorConsole::sigIntDiag() {
     static bool tryReboot = false;
     if(_shellMode && !tryReboot) {
         tryReboot = true;
-        bool allow = CursesDialog::ensure("Are you sure?", "Exit NexusCoordinator Shell");
+        QString option = CursesDialog::options(QStringList() << "E_xit" << "_Always Exit" << "_Drop to Shell" << "Cl_ose", "You pressed CTRL+C, or something generated a INT signal.", "Signal INT Captured");
+        if(option == "Drop to Shell")
+            dropToShell();
+
         tryReboot = false;
-        if(!allow)
+        if(!option.endsWith("Exit"))
             return;
     }
 
@@ -219,7 +226,7 @@ void CoordinatorConsole::terminateRequested(int sig) {
         _terminated = true;
         kill(child_pid, sig);
     } else if(sig == SIGINT)
-        metaObject()->invokeMethod(this, "exit", Qt::QueuedConnection);
+        metaObject()->invokeMethod(this, "sigIntDiag", Qt::QueuedConnection);
     else
         CursesMainWindow::terminateRequested(sig);
 

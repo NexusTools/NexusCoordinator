@@ -142,7 +142,7 @@ protected slots:
     void dropToShell();
     void dropToRootShell();
     void editCronTab();
-    void exit(int code =0);
+    void sigIntDiag();
 
 
     void runVim(QString file =QString());
@@ -182,8 +182,10 @@ private:
     CursesAction launchLynx;
 
 
-    CursesAction createScreen;
     CursesAction installScreen;
+
+    CursesAction createScreen;
+    CursesAction manageOtherUser;
     CursesMenuSeparator screenListSeparator;
     CursesLabel screenNoInstancesMessage;
 
