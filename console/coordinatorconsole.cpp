@@ -1,4 +1,5 @@
 #include "coordinatorconsole.h"
+#include "screenaction.h"
 
 #include <unistd.h>
 #include <sys/wait.h>
@@ -14,7 +15,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())), _menuBar(this),
             _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
-            createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), _statusBar(this) {
+            createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
     _updateDateTime.setInterval(1000);
     connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
@@ -65,6 +66,10 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
         action = new CursesAction("Restart", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(sudoReboot()));
+
+        connect(&_rescanTimer, SIGNAL(timeout()), this, SLOT(rescanAvailableFunctions()));
+        _rescanTimer.setInterval(2000);
+        _rescanTimer.start();
     }
 
 
@@ -124,22 +129,73 @@ void CoordinatorConsole::rescanAvailableFunctions() {
     launchELinks.setText(e ? "ELinks" : "Install ELinks");
     launchLynx.setVisible(l);
 
-    _launch.fitToContent();
-    _launch.markDirty();
-
     // Rescan Screens
-    QDir screenDir(SCREEN_DIR);
+    typedef QSharedPointer<ScreenAction> Screen;
+    static QHash<QString, Screen> screens;
+
+    static QDir screenDir(SCREEN_DIR);
+    static char* user = getenv("USER");
     if(screenDir.exists()) {
         screenListSeparator.show();
         installScreen.hide();
         createScreen.show();
 
+        if(user) {
+            QDir userDir(QString(SCREEN_DIR "/S-%1").arg(user));
+            if(userDir.exists()) {
+                QHash<QString, Screen> oldScreens = screens;
+                screens.clear();
+
+                static QRegExp nameFormat("(\\d+)\\.(.+)");
+                foreach(QFileInfo info, userDir.entryInfoList(QDir::Files | QDir::System | QDir::Hidden)) {
+                    QString name = info.fileName();
+
+                    if(!nameFormat.exactMatch(name))
+                        continue;
+
+                    bool idOkay;
+                    int id = nameFormat.cap(1).toInt(&idOkay);
+                    if(!idOkay)
+                        continue;
+
+                    name = nameFormat.cap(2);
+                    Screen scr = oldScreens.value(name);
+                    if(!scr)
+                        scr = Screen(new ScreenAction(id, name, &_screens));
+                    screens.insert(scr->text(), scr);
+                }
+
+                screenNoInstancesMessage.setVisible(screens.isEmpty());
+            } else {
+                screenNoInstancesMessage.show();
+                screens.clear();
+            }
+        } else {
+            screenNoInstancesMessage.show();
+            screens.clear();
+        }
+
+
+        screenDir.entryList();
     } else {
+        screenNoInstancesMessage.hide();
         screenListSeparator.hide();
         installScreen.show();
         createScreen.hide();
 
+        screens.clear();
     }
+}
+
+bool ScreenAction::processEvent(QEvent *e) {
+    if(e->type() == GUIEvent::GUIActivated) {
+        CoordinatorConsole* con = (CoordinatorConsole*)CursesMainWindow::current();
+        if(con) {
+            con->startShell(QStringList() << "screen" << "-x" << QString("%1.%2").arg(_id).arg(name()));
+            return true;
+        }
+    }
+    return CursesAction::processEvent(e);
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {

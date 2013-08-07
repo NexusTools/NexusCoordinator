@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     coordinatorconsole.cpp
 
 HEADERS += \
-    coordinatorconsole.h
+    coordinatorconsole.h \
+    screenaction.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/GenericUI/core/release/ -lGenericUI
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/GenericUI/core/debug/ -lGenericUI
