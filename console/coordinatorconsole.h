@@ -204,8 +204,6 @@ public slots:
 protected:
     inline virtual void fixLayoutImpl() {
         CursesMainWindow::fixLayoutImpl();
-
-        _menuBar.resize(QSize(80, 1));
         _statusBar.move(width()-_statusBar.width(), 0);
     }
 

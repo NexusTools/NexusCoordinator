@@ -80,10 +80,12 @@ QString CoordinatorConsole::quoteArg(QString arg) {
     foreach(QChar c, arg) {
         if(c.isSpace())
             space = true;
-        else if(!c.isLetterOrNumber() && c != ';' && c != '-') {
+        else if(!c.isLetterOrNumber() && c != '-') {
             needQuote = true;
             arS.clear();
-            ar += '\\';
+
+            if(!c.isPunct())
+                ar += '\\';
         }
 
         ar += c;
