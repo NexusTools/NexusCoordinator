@@ -5,12 +5,17 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include <QMutexLocker>
 #include <QDateTime>
 #include <QThread>
 #include <QDebug>
 #include <QDir>
 
+#ifdef LEGACY_QT
+void __msgOutput(QtMsgType type, const char* msg)
+#else
 void __msgOutput(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)
+#endif
 {
     QByteArray streamData;
     {
@@ -53,6 +58,7 @@ void __msgOutput(QtMsgType type, const QMessageLogContext &ctx, const QString &m
 
         textStream << "] ";
 
+#ifndef LEGACY_QT
         QString func(ctx.function);
         if(func.isEmpty())
             func = "anonymous";
@@ -70,11 +76,14 @@ void __msgOutput(QtMsgType type, const QMessageLogContext &ctx, const QString &m
             file = "Unknown";
 
         textStream << file << ':' << ctx.line << '\n';
+#endif
         textStream << msg << "\n";
     }
 
-
     // Ensure messages don't get merged due to threading
+    static QMutex mutex;
+    QMutexLocker lock(&mutex);
+
     static QFile log("output.log");
     if(!log.isOpen())
         log.open(QFile::WriteOnly);
@@ -91,7 +100,11 @@ int main(int argc, char *argv[])
     a.setApplicationName("NexusCoordinator");
     a.setApplicationVersion(VERSION);
 
+#ifdef LEGACY_QT
+    qInstallMsgHandler(__msgOutput);
+#else
     qInstallMessageHandler(__msgOutput);
+#endif
 
     char* path = getenv("PATH");
     if(path)
