@@ -142,6 +142,7 @@ protected slots:
     void dropToShell();
     void dropToRootShell();
     void editCronTab();
+    void exit(int code =0);
 
 
     void runVim(QString file =QString());
@@ -156,6 +157,7 @@ protected slots:
 private:
     int child_pid;
     bool _terminated;
+    bool _shellMode;
 
     QTimer _blinkTimer;
     QTimer _rescanTimer;

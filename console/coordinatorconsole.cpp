@@ -19,6 +19,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
             createScreen("Create Screen", &_screens), installScreen("Install Screen", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
+    _shellMode = shellMode;
     _updateDateTime.setInterval(1000);
     connect(&_updateDateTime, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
     _updateDateTime.start();
@@ -45,7 +46,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     _coordinator.addSeparator();
 
     action = new CursesAction("E_xit", &_coordinator);
-    connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
+    connect(action, SIGNAL(activated()), this, SLOT(exit()));
 
 
     if(shellMode) {
@@ -66,7 +67,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
         _system.addSeparator();
 
-        action = new CursesAction("Restart", &_system);
+        action = new CursesAction("Re_boot", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(sudoReboot()));
 
         connect(&_rescanTimer, SIGNAL(timeout()), this, SLOT(rescanAvailableFunctions()));
@@ -200,12 +201,28 @@ bool ScreenAction::processEvent(QEvent *e) {
     return CursesAction::processEvent(e);
 }
 
+void CoordinatorConsole::exit(int code) {
+    static bool tryReboot = false;
+    if(_shellMode && !tryReboot) {
+        tryReboot = true;
+        bool allow = CursesDialog::ensure("Are you sure?", "Exit NexusCoordinator Shell");
+        tryReboot = false;
+        if(!allow)
+            return;
+    }
+
+    CursesMainWindow::terminateRequested(SIGINT);
+}
+
 void CoordinatorConsole::terminateRequested(int sig) {
     if(child_pid > 0) {
         _terminated = true;
         kill(child_pid, sig);
-    } else
+    } else if(sig == SIGINT)
+        metaObject()->invokeMethod(this, "exit", Qt::QueuedConnection);
+    else
         CursesMainWindow::terminateRequested(sig);
+
 }
 
 void initEnv() {
@@ -354,7 +371,8 @@ void CoordinatorConsole::aptInstall(QString pkg) {
 }
 
 void CoordinatorConsole::sudoReboot() {
-    startShell(QStringList() << "sudo" << "reboot", "Enter your password to reboot.\n\n");
+    if(CursesDialog::ensure("This will reboot the server, are you sure?", "Reboot"))
+        startShell(QStringList() << "sudo" << "reboot", "Enter your password to reboot.\n\n");
 }
 
 void CoordinatorConsole::dropToShell() {
