@@ -186,7 +186,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QStri
     } else if(!finMsg.isEmpty())
         _statusQueue << finMsg;
     else
-        _statusQueue << QString("`%1` exited").arg(quotedCmd);
+        _statusQueue << QString("`%1` finished").arg(quotedCmd);
     child_pid=0;
 
     rescanAvailableFunctions();
@@ -221,7 +221,6 @@ void CoordinatorConsole::dropToRootShell() {
 void CoordinatorConsole::editCronTab() {
     startShell(QStringList() << "crontab" << "-e");
 }
-
 
 void CoordinatorConsole::runVim(QString file){
     QStringList args;
