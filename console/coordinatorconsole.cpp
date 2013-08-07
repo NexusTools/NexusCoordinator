@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <cursesdialog.h>
+
 #include <QCoreApplication>
 #include <QDir>
 
@@ -343,7 +345,8 @@ void CoordinatorConsole::aptUpdateUpgrade() {
 }
 
 void CoordinatorConsole::aptUpdateDistUpgrade() {
-    startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get dist-upgrade", "Follow the instructions below.\n\n");
+    if(CursesDialog::ensure("This could be dangerous, are you sure?", "Aggressive Upgrade"))
+        startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get dist-upgrade", "Follow the instructions below.\n\n");
 }
 
 void CoordinatorConsole::aptInstall(QString pkg) {
