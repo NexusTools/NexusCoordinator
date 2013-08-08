@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
                 signal(SIGQUIT, pass_signal);
                 signal(SIGTERM, pass_signal);
                 signal(SIGKILL, pass_signal);
-                signal(SIGINT, pass_signal);
+                //signal(SIGINT, pass_signal);
 
                 atexit(kill_child);
                 while (-1 == waitpid(child_pid, &status, 0));
