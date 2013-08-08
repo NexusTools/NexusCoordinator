@@ -13,11 +13,18 @@
 
 #define SCREEN_DIR "/var/run/screen"
 
+void keyboardStop(int sig) {
+    ((CoordinatorConsole*)CoordinatorConsole::current())->terminateRequested(sig);
+}
+
 CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())), _menuBar(this),
             _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
             installScreen("Install Screen", &_screens), createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
+
+    if(shellMode)
+        signal(SIGTSTP, keyboardStop);
 
     _shellMode = shellMode;
     _updateDateTime.setInterval(1000);
@@ -34,17 +41,16 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
         connect(action, SIGNAL(activated()), this, SLOT(dropToShell()), Qt::QueuedConnection);
         action = new CursesAction("Drop to _Root Shell", &_coordinator);
         connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()), Qt::QueuedConnection);
-
-        _coordinator.addSeparator();
+    } else {
+        action = new CursesAction("Connect to...", &_coordinator);
+        action->disable();
+        action = new CursesAction("Disconnect", &_coordinator);
+        action->disable();
     }
-
-    action = new CursesAction("Connect to...", &_coordinator);
-    action->disable();
-    action = new CursesAction("Disconnect", &_coordinator);
-    action->disable();
 
     _coordinator.addSeparator();
 
+    new CursesAction("Configure", &_coordinator);
     action = new CursesAction("E_xit", &_coordinator);
     connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
@@ -53,7 +59,8 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
         rescanAvailableFunctions();
 
 
-        new CursesAction("Add User", &_system);
+        action = new CursesAction("Add User", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(addUser()));
         new CursesAction("Add Group", &_system);
         action = new CursesAction("Edit Cron Tab", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(editCronTab()));
@@ -205,6 +212,11 @@ bool ScreenAction::processEvent(QEvent *e) {
     return CursesAction::processEvent(e);
 }
 
+void CoordinatorConsole::sigTStpDiag() {
+    QString option = CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or something generated a TSTP signal.", "Signal TSTP Captured");
+
+}
+
 void CoordinatorConsole::sigIntDiag() {
     static bool tryReboot = false;
     if(_shellMode && !tryReboot) {
@@ -221,12 +233,37 @@ void CoordinatorConsole::sigIntDiag() {
     CursesMainWindow::terminateRequested(SIGINT);
 }
 
+void CoordinatorConsole::addUser() {
+    CursesDialog* diag = new CursesDialog("Add User", this);
+    connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
+    diag->setLayout(GUIContainer::VerticalLayout);
+
+    CursesHBox* columns = new CursesHBox(Spacing(1, 0), diag);
+    CursesVBox* cell = new CursesVBox(columns);
+    new CursesLabel("Username", cell);
+    cell = new CursesVBox(columns);
+    new CursesLabel("Shell", cell);
+
+    CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
+    foreach(QString option, QStringList() << "_Add User" << "_Nevermind") {
+        CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, buttonContainer);
+        connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+    }
+
+    diag->exec();
+}
+
 void CoordinatorConsole::terminateRequested(int sig) {
     if(child_pid > 0) {
         _terminated = true;
         kill(child_pid, sig);
+
+        if(sig == SIGTSTP)
+            metaObject()->invokeMethod(this, "sigTStpDiag", Qt::QueuedConnection);
     } else if(sig == SIGINT)
         metaObject()->invokeMethod(this, "sigIntDiag", Qt::QueuedConnection);
+    else if(sig == SIGTSTP)
+        return;
     else
         CursesMainWindow::terminateRequested(sig);
 
@@ -346,7 +383,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QStri
     sleep(2);
 
     int status;
-    while (child_pid > 0 && -1 == waitpid(child_pid, &status, 0));
+    while (child_pid > 0 && -1 == waitpid(child_pid, &status, WUNTRACED));
     if(status != 0) {
         if(_terminated)
             _statusQueue << QString("`%1` terminated").arg(quotedCmd);

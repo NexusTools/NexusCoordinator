@@ -142,7 +142,9 @@ protected slots:
     void dropToShell();
     void dropToRootShell();
     void editCronTab();
+    void sigTStpDiag();
     void sigIntDiag();
+    void addUser();
 
 
     void runVim(QString file =QString());
