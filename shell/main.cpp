@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
         child_pid = fork();
         if (child_pid == 0)
         {
-            execl("/usr/bin/NexusCoordinatorConsole", "nc-term", "--sh", 0);
+            execl("/usr/bin/nc-term", "nc-term", "--sh", 0);
             _exit(-1);
         } else if(child_pid > 0) {
             sleep(2);
@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
                 signal(SIGQUIT, pass_signal);
                 signal(SIGTERM, pass_signal);
                 signal(SIGKILL, pass_signal);
+                signal(SIGTSTP, pass_signal);
                 signal(SIGINT, SIG_IGN);
 
                 atexit(kill_child);
