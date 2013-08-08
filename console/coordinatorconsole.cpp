@@ -22,7 +22,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())), _menuBar(this),
             _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
-            installScreen("Install Screen", &_screens), createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
+            _installScreen("Install Screen", &_screens), _createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
     if(shellMode)
         signal(SIGTSTP, keyboardStop);
@@ -59,6 +59,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     if(shellMode) {
         rescanAvailableFunctions();
 
+        connect(&_createScreen, SIGNAL(activated()), this, SLOT(createScreen()));
 
         action = new CursesAction("Create User", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(createUser()));
@@ -107,7 +108,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     connect(&launchELinks, SIGNAL(activated()), this, SLOT(runELinks()));
     connect(&launchW3M, SIGNAL(activated()), this, SLOT(runW3M()));
 
-    connect(&installScreen, SIGNAL(activated()), this, SLOT(installScreenPkg()));
+    connect(&_installScreen, SIGNAL(activated()), this, SLOT(installScreenPkg()));
 
 
     updateStatusMessage();
@@ -151,8 +152,8 @@ void CoordinatorConsole::rescanAvailableFunctions() {
     if(screenDir.exists()) {
         screenListSeparator.show();
         manageOtherUser.show();
-        installScreen.hide();
-        createScreen.show();
+        _installScreen.hide();
+        _createScreen.show();
 
         if(user) {
             QDir userDir(QString(SCREEN_DIR "/S-%1").arg(user));
@@ -195,8 +196,8 @@ void CoordinatorConsole::rescanAvailableFunctions() {
         screenNoInstancesMessage.hide();
         screenListSeparator.hide();
         manageOtherUser.hide();
-        installScreen.show();
-        createScreen.hide();
+        _installScreen.show();
+        _createScreen.hide();
 
         screens.clear();
     }
@@ -206,7 +207,7 @@ bool ScreenAction::processEvent(QEvent *e) {
     if(e->type() == GUIEvent::GUIActivated) {
         CoordinatorConsole* con = (CoordinatorConsole*)CursesMainWindow::current();
         if(con) {
-            con->startShell(QStringList() << "screen" << "-x" << QString("%1.%2").arg(_id).arg(name()));
+            con->startShell(QStringList() << "screen" << "-x" << QString("%1.%2").arg(_id).arg(name()), "", QString("%1 ~ Screen").arg(name()).toLocal8Bit());
             return true;
         }
     }
@@ -231,6 +232,57 @@ void CoordinatorConsole::sigIntDiag() {
     }
 
     CursesMainWindow::terminateRequested(SIGINT);
+}
+
+void CoordinatorConsole::createScreen() {
+    CursesDialog* diag = new CursesDialog("Create Screen", this);
+    connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
+    diag->setLayout(GUIContainer::VerticalLayout);
+
+    CursesVBox* msg = new CursesVBox(diag);
+    new CursesLabel("This will create a new screen.", msg);
+
+
+    CursesHBox* columns = new CursesHBox(Spacing(1, 0), diag);
+    CursesVBox* cell = new CursesVBox(columns);
+    cell->setWAttr(GUIWidget::FloatCenter);
+    new CursesLabel("Name", cell);
+    CursesLineEdit* name = new CursesLineEdit(cell);
+
+    cell = new CursesVBox(columns);
+    cell->setWAttr(GUIWidget::FloatCenter);
+    new CursesLabel("Command", cell);
+    CursesLineEdit* command = new CursesLineEdit("bash", cell);
+
+//    columns = new CursesHBox(Spacing(1, 0), diag);
+//    cell = new CursesVBox(columns);
+//    cell->setWAttr(GUIWidget::FloatCenter);
+//    new CursesLabel("Shared", cell);
+//    new CursesLineEdit(cell);
+
+//    cell = new CursesVBox(columns);
+//    cell->setWAttr(GUIWidget::FloatCenter);
+//    new CursesLabel("As User", cell);
+//    new CursesLineEdit(getenv("USER"), cell);
+
+
+
+    CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
+    foreach(QString option, QStringList() << "Cre_ate Screen" << "_Nevermind" << "_Help") {
+        CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, buttonContainer);
+        connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+    }
+
+    forever {
+        diag->exec();
+
+        QString ret = diag->value<QString>();
+        if(ret == "Create Screen")
+            startShell(QStringList() << "screen" << "-S" << name->text() << command->text(), "Creating screen ...", QString("%1 ~ Shell").arg(name->text()).toLocal8Bit());
+        else if(ret == "Help")
+            continue;
+        break;
+    }
 }
 
 void CoordinatorConsole::createUser() {
@@ -324,7 +376,7 @@ QString CoordinatorConsole::quoteArg(QString arg) {
     return ar;
 }
 
-void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QString finMsg) {
+void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByteArray title, QString finMsg) {
     _terminated = false;
 
     QString quotedCmd;
@@ -351,7 +403,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QStri
     {
         endwin();
 
-        printf("\033]0;%s\007\e[H\e[2J", qPrintable(quotedCmd));
+        printf("\033]0;%s\007\e[H\e[2J", qPrintable(title.isEmpty() ? quotedCmd : title));
         fflush(stdout);
 
         QByteArray launchMsg = QString("Launching `%1` ...\n").arg(quotedCmd).toLocal8Bit();

@@ -75,7 +75,7 @@ public slots:
         _statusBar.setAttr(_statusBar.attr() ^ CursesLabel::Standout);
     }
 
-    void startShell(QStringList, QByteArray startMsg ="", QString finMsg ="");
+    void startShell(QStringList, QByteArray startMsg ="", QByteArray title="", QString finMsg ="");
     inline void updateStatusMessage() {
         QDateTime dateTime = QDateTime::currentDateTime();
         QString nextMessage;
@@ -144,7 +144,6 @@ protected slots:
     void editCronTab();
     void sigTStpDiag();
     void sigIntDiag();
-    void createUser();
 
 
     void runVim(QString file =QString());
@@ -154,6 +153,11 @@ protected slots:
     void runLynx(QString url =QString());
     void runW3M(QString url =QString());
 
+
+    void createScreen();
+
+
+    void createUser();
     void rescanAvailableFunctions();
 
 private:
@@ -184,9 +188,8 @@ private:
     CursesAction launchLynx;
 
 
-    CursesAction installScreen;
-
-    CursesAction createScreen;
+    CursesAction _installScreen;
+    CursesAction _createScreen;
     CursesAction manageOtherUser;
     CursesMenuSeparator screenListSeparator;
     CursesLabel screenNoInstancesMessage;
