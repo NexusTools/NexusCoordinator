@@ -144,7 +144,7 @@ protected slots:
     void editCronTab();
     void sigTStpDiag();
     void sigIntDiag();
-    void addUser();
+    void createUser();
 
 
     void runVim(QString file =QString());

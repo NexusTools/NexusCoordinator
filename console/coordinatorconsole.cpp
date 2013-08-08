@@ -60,9 +60,9 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
         rescanAvailableFunctions();
 
 
-        action = new CursesAction("Add User", &_system);
-        connect(action, SIGNAL(activated()), this, SLOT(addUser()));
-        new CursesAction("Add Group", &_system);
+        action = new CursesAction("Create User", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(createUser()));
+        //new CursesAction("Add Group", &_system);
         action = new CursesAction("Edit Cron Tab", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(editCronTab()));
 
@@ -233,22 +233,32 @@ void CoordinatorConsole::sigIntDiag() {
     CursesMainWindow::terminateRequested(SIGINT);
 }
 
-void CoordinatorConsole::addUser() {
-    CursesDialog* diag = new CursesDialog("Add User", this);
+void CoordinatorConsole::createUser() {
+    CursesDialog* diag = new CursesDialog("Create User", this);
     connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
     diag->setLayout(GUIContainer::VerticalLayout);
 
+    CursesVBox* msg = new CursesVBox(diag);
+    new CursesLabel("This will create a new system user with", msg);
+    new CursesLabel("access to ssh, ftp and mail.", msg);
+
+    msg = new CursesVBox(diag);
+    new CursesLabel("This does not effect the database of any", msg);
+    new CursesLabel("websites or other services.", msg);
+
     CursesHBox* columns = new CursesHBox(Spacing(1, 0), diag);
     CursesVBox* cell = new CursesVBox(columns);
+    cell->setWAttr(GUIWidget::FloatCenter);
     new CursesLabel("Username", cell);
     new CursesLineEdit(cell);
 
     cell = new CursesVBox(columns);
+    cell->setWAttr(GUIWidget::FloatCenter);
     new CursesLabel("Shell", cell);
     new CursesLineEdit("/bin/nc-shell", cell);
 
     CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
-    foreach(QString option, QStringList() << "_Add User" << "_Nevermind") {
+    foreach(QString option, QStringList() << "Cre_ate User" << "_Nevermind") {
         CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, buttonContainer);
         connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
