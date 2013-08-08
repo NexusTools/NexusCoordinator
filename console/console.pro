@@ -11,7 +11,7 @@ QT       -= gui
 !greaterThan(QT_MAJOR_VERSION, 4): DEFINES += LEGACY_QT
 
 # Project Information
-TARGET = NexusCoordinatorConsole
+TARGET = nc-term
 CONFIG   += console
 CONFIG   -= app_bundle
 LIBS += -lncurses

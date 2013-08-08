@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     else
         QDir::setSearchPaths("bin", QStringList() << "/usr/bin" << "/bin" << "/local/bin" << "/local/usr/bin" << "/opt/bin" << "/opt/usr/bin");
 
-    new CoordinatorConsole(a.arguments().contains("--shell"));
+    new CoordinatorConsole(a.arguments().contains("--sh"));
     int ret = a.exec();
     endwin();
 

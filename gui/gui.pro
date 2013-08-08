@@ -13,7 +13,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 exists($$PWD/../extern/GitProjectVersionQt/version.pri) : include($$PWD/../extern/GitProjectVersionQt/version.pri)
 
 # Project Information
-TARGET = NexusCoordinatorGUI
+TARGET = nc-qt
 TEMPLATE = app
 
 # Project Files

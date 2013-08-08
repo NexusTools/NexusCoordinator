@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
         child_pid = fork();
         if (child_pid == 0)
         {
-            execl("/usr/bin/NexusCoordinatorConsole", "NexusCoordinatorConsole", "--shell", 0);
+            execl("/usr/bin/NexusCoordinatorConsole", "nc-term", "--sh", 0);
             _exit(-1);
         } else if(child_pid > 0) {
             sleep(2);

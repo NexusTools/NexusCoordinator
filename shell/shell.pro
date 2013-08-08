@@ -7,7 +7,7 @@
 QT       -= core
 QT       -= gui
 
-TARGET	= NexusCoordinatorShell
+TARGET	= nc-shell
 CONFIG   += console
 CONFIG   -= app_bundle
 

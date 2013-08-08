@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <curseslineedit.h>
 #include <cursesdialog.h>
 
 #include <QCoreApplication>
@@ -213,8 +214,7 @@ bool ScreenAction::processEvent(QEvent *e) {
 }
 
 void CoordinatorConsole::sigTStpDiag() {
-    QString option = CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or something generated a TSTP signal.", "Signal TSTP Captured");
-
+    CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or something generated a TSTP signal.", "Signal TSTP Captured");
 }
 
 void CoordinatorConsole::sigIntDiag() {
@@ -241,8 +241,11 @@ void CoordinatorConsole::addUser() {
     CursesHBox* columns = new CursesHBox(Spacing(1, 0), diag);
     CursesVBox* cell = new CursesVBox(columns);
     new CursesLabel("Username", cell);
+    new CursesLineEdit(cell);
+
     cell = new CursesVBox(columns);
     new CursesLabel("Shell", cell);
+    new CursesLineEdit("/bin/nc-shell", cell);
 
     CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
     foreach(QString option, QStringList() << "_Add User" << "_Nevermind") {
