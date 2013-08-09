@@ -9,7 +9,7 @@ int child_pid = 0;
 int main(int argc, char *argv[])
 {
     if(argc == 1) {
-        printf("Starting NexusCoordinator ... ");
+        printf("Starting NexusCoordinator ...\n");
         fflush(stdout);
 
         int status;
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
             }
 
             kill(child_pid, SIGTERM);
-            if(tLeft <= 0 && WEXITSTATUS(status) == 0)
+            if(tLeft > 0 && WEXITSTATUS(status) == 0)
                 execl("/usr/bin/nc-term", "nc-term", "--shell", 0);
         } else
             child_pid = 0;
