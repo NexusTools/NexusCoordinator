@@ -130,6 +130,9 @@ protected:
     }
 
 protected slots:
+    void configure();
+
+
     inline void installScreenPkg() {
         aptInstall("screen");
     }

@@ -51,7 +51,8 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
     _coordinator.addSeparator();
 
-    new CursesAction("Configure", &_coordinator);
+    action = new CursesAction("Configure", &_coordinator);
+    connect(action, SIGNAL(activated()), this, SLOT(configure()));
     action = new CursesAction("E_xit", &_coordinator);
     connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
@@ -316,6 +317,64 @@ void CoordinatorConsole::createUser() {
     }
 
     diag->exec();
+}
+
+void CoordinatorConsole::configure() {
+    CursesDialog* diag = new CursesDialog("Configure NexusCoordinator", this);
+    connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
+    diag->setLayout(GUIContainer::VerticalLayout);
+
+    CursesVBox* vBox = new CursesVBox(diag);
+    new CursesLabel("Currently only the theme is configurable,", vBox);
+    new CursesLabel("Click a theme below to change to it.", vBox);
+
+    CursesHBox* hBox = new CursesHBox(Spacing(1, 0), diag);
+    foreach(QString option, QStringList() << "_Default" << "_Green" << "_Magenta") {
+        CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, hBox);
+        connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+    }
+    hBox = new CursesHBox(Spacing(1, 0), diag);
+    foreach(QString option, QStringList() << "C_yan" << "_Blue" << "_Red") {
+        CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, hBox);
+        connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+    }
+
+    CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
+    CursesButton* act = new CursesButton("Clos_e", GUIWidget::FloatRight, buttonContainer);
+    connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+
+    forever {
+        diag->exec();
+        QString val = diag->value<QString>();
+
+        if(val == "Default") {
+            init_pair(1, COLOR_WHITE, COLOR_BLACK);
+            init_pair(2, COLOR_CYAN, COLOR_BLACK);
+            continue;
+        } else if(val == "Green") {
+            init_pair(1, COLOR_GREEN, COLOR_BLACK);
+            init_pair(2, COLOR_WHITE, COLOR_BLACK);
+            continue;
+        } else if(val == "Magenta") {
+            init_pair(1, COLOR_MAGENTA, COLOR_BLACK);
+            init_pair(2, COLOR_WHITE, COLOR_BLACK);
+            continue;
+        } else if(val == "Cyan") {
+            init_pair(1, COLOR_CYAN, COLOR_BLACK);
+            init_pair(2, COLOR_WHITE, COLOR_BLACK);
+            continue;
+        } else if(val == "Red") {
+            init_pair(1, COLOR_RED, COLOR_BLACK);
+            init_pair(2, COLOR_WHITE, COLOR_BLACK);
+            continue;
+        } else if(val == "Blue") {
+            init_pair(1, COLOR_BLUE, COLOR_BLACK);
+            init_pair(2, COLOR_WHITE, COLOR_BLACK);
+            continue;
+        }
+
+        break;
+    }
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {
