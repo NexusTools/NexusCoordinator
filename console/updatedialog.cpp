@@ -47,7 +47,7 @@ void CoordinatorUpdateDialog::showImpl()  {
             return;
 
         CursesDialog::alert("Development builds are currently unavailable...", "Cannot Continue");
-    } else if("Update")
+    } else if(val == "Update")
         repoUrl = "https://github.com/NexusTools/NexusCoordinator.git";
     else
         return;
