@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QDateTime>
 
+#include <sys/wait.h>
+#include <unistd.h>
 #include <unistd.h>
 
 #include <curseslabel.h>
@@ -101,8 +103,12 @@ void CoordinatorUpdateDialog::showImpl()  {
                 }
 
                 kill(child_pid, SIGKILL);
-                if(tLeft > 0 && WEXITSTATUS(status) == 0)
-                    execl("/usr/bin/nc-term", "nc-term", "--shell", 0);
+                if(tLeft > 0 && WEXITSTATUS(status) == 0) {
+                    if(console->_shellMode)
+                        execl("/usr/bin/nc-shell", "nc-shell", 0);
+                    else
+                        execl("/usr/bin/nc-term", "nc-term", 0);
+                }
 
                 CursesDialog::alert("The built update could not be run...", "Update Failed");
             }
