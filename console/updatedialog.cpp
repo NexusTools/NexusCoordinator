@@ -87,15 +87,31 @@ void CoordinatorUpdateDialog::showImpl()  {
                 goto cleanup;
             }
 
-            ret = console->startShell(QCoreApplication::instance()->arguments()) ? 0 : 1;
+            int status;
+            console->titleChanged();
+            int child_pid = fork();
+            if (child_pid == 0) {
+                execl("/usr/bin/nc-term", "nc-term", "--test-terminal", 0);
+                _exit(-1);
+            } else if(child_pid > 0) {
+                int tLeft = 20; // Wait 2 seconds for test to complete before assuming it failed
+                while(tLeft > 0 && waitpid(child_pid, &status, WNOHANG) == 0) {
+                    usleep(100000); // Sleep 100ms
+                    tLeft--;
+                }
 
-            endwin();
-            _exit(ret);
+                kill(child_pid, SIGKILL);
+                if(tLeft > 0 && WEXITSTATUS(status) == 0)
+                    execl("/usr/bin/nc-term", "nc-term", "--shell", 0);
+
+                CursesDialog::alert("The built update could not be run...", "Update Failed");
+            }
         } else
             CursesDialog::alert("Cannot create directory to build in...", "Cannot Continue");
 
 cleanup:
         console->_upgraded = false;
+        console->titleChanged();
         return;
     }
 }

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
                 tLeft--;
             }
 
-            kill(child_pid, SIGTERM);
+            kill(child_pid, SIGKILL);
             if(tLeft > 0 && WEXITSTATUS(status) == 0)
                 execl("/usr/bin/nc-term", "nc-term", "--shell", 0);
         } else
