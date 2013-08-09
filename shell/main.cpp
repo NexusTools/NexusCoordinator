@@ -6,56 +6,27 @@
 
 int child_pid = 0;
 
-void kill_child() {
-    kill(child_pid, SIGTERM);
-    kill(child_pid, SIGKILL);
-}
-
-void pass_signal(int sig) {
-    if(child_pid > 0)
-        kill(child_pid, sig);
-    else {
-        fprintf(stderr, "Exiting with signal %i", sig);
-        exit(sig);
-    }
-}
-
 int main(int argc, char *argv[])
 {
     if(argc == 1) {
         printf("Starting NexusCoordinator ... ");
         fflush(stdout);
 
+        int status;
         child_pid = fork();
-        if (child_pid == 0)
-        {
-            execl("/usr/bin/nc-term", "nc-term", "--sh", 0);
+        if (child_pid == 0) {
+            execl("/usr/bin/nc-term", "nc-term", "--test-terminal", 0);
             _exit(-1);
         } else if(child_pid > 0) {
-            sleep(2);
-
-            int status;
-            if(waitpid(child_pid, &status, WNOHANG) == 0) {
-                signal(SIGHUP, pass_signal);
-                signal(SIGSEGV, pass_signal);
-                signal(SIGABRT, pass_signal);
-                signal(SIGQUIT, pass_signal);
-                signal(SIGTERM, pass_signal);
-                signal(SIGKILL, pass_signal);
-                signal(SIGTSTP, SIG_IGN);
-                signal(SIGINT, SIG_IGN);
-
-                atexit(kill_child);
-                for(;;) {
-                    waitpid(child_pid, &status, WUNTRACED);
-
-                    if(WIFSTOPPED(status))
-                        kill(child_pid, SIGCONT);
-                    else
-                        return WEXITSTATUS(status);
-                }
+            int tLeft = 20; // Wait 2 seconds for test to complete before assuming it failed
+            while(tLeft > 0 && waitpid(child_pid, &status, WNOHANG) == 0) {
+                usleep(100000); // Sleep 100ms
+                tLeft--;
             }
-            kill_child();
+
+            kill(child_pid, SIGTERM);
+            if(tLeft <= 0 && WEXITSTATUS(status) == 0)
+                execl("/usr/bin/nc-term", "nc-term", "--shell", 0);
         } else
             child_pid = 0;
 
