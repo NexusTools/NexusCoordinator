@@ -20,7 +20,7 @@ void keyboardStop(int sig) {
 
 CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())), _menuBar(this),
-            _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
+            _config(), _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
             _installScreen("Install Screen", &_screens), _createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
@@ -35,6 +35,8 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     _blinkTimer.setInterval(600);
     connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkStatus()));
     connect(&_statusBar, SIGNAL(clicked()), this, SLOT(notifyClicked()));
+
+    setTheme(_config.value("theme").toString());
 
     CursesAction* action;
     if(shellMode) {
@@ -346,35 +348,37 @@ void CoordinatorConsole::configure() {
     forever {
         diag->exec();
         QString val = diag->value<QString>();
+        if(val == "Close")
+            break;
 
-        if(val == "Default") {
-            init_pair(1, COLOR_WHITE, COLOR_BLACK);
-            init_pair(2, COLOR_CYAN, COLOR_BLACK);
-            continue;
-        } else if(val == "Green") {
-            init_pair(1, COLOR_GREEN, COLOR_BLACK);
-            init_pair(2, COLOR_WHITE, COLOR_BLACK);
-            continue;
-        } else if(val == "Magenta") {
-            init_pair(1, COLOR_MAGENTA, COLOR_BLACK);
-            init_pair(2, COLOR_WHITE, COLOR_BLACK);
-            continue;
-        } else if(val == "Cyan") {
-            init_pair(1, COLOR_CYAN, COLOR_BLACK);
-            init_pair(2, COLOR_WHITE, COLOR_BLACK);
-            continue;
-        } else if(val == "Red") {
-            init_pair(1, COLOR_RED, COLOR_BLACK);
-            init_pair(2, COLOR_WHITE, COLOR_BLACK);
-            continue;
-        } else if(val == "Blue") {
-            init_pair(1, COLOR_BLUE, COLOR_BLACK);
-            init_pair(2, COLOR_WHITE, COLOR_BLACK);
-            continue;
-        }
-
-        break;
+        setTheme(val);
+        continue;
     }
+}
+
+void CoordinatorConsole::setTheme(QString name) {
+    if(name == "Default") {
+        init_pair(1, COLOR_WHITE, COLOR_BLACK);
+        init_pair(2, COLOR_CYAN, COLOR_BLACK);
+    } else if(name == "Green") {
+        init_pair(1, COLOR_GREEN, COLOR_BLACK);
+        init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    } else if(name == "Magenta") {
+        init_pair(1, COLOR_MAGENTA, COLOR_BLACK);
+        init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    } else if(name == "Cyan") {
+        init_pair(1, COLOR_CYAN, COLOR_BLACK);
+        init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    } else if(name == "Red") {
+        init_pair(1, COLOR_RED, COLOR_BLACK);
+        init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    } else if(name == "Blue") {
+        init_pair(1, COLOR_BLUE, COLOR_BLACK);
+        init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    } else
+        return;
+
+    _config.setValue("theme", name);
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {

@@ -10,6 +10,7 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QFileInfo>
+#include <QSettings>
 #include <QTimer>
 #include <QTime>
 #include <QFile>
@@ -131,6 +132,7 @@ protected:
 
 protected slots:
     void configure();
+    void setTheme(QString name);
 
 
     inline void installScreenPkg() {
@@ -172,6 +174,7 @@ private:
     QTimer _rescanTimer;
     QTimer _updateDateTime;
     QStringList _statusQueue;
+    QSettings _config;
 
 
     CursesMenuBar _menuBar;
