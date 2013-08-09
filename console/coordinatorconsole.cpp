@@ -19,8 +19,8 @@ void keyboardStop(int sig) {
 }
 
 CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
-            shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())), _menuBar(this),
-            _config(), _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
+            shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())),
+            _updateDiag(this), _menuBar(this), _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
             _installScreen("Install Screen", &_screens), _createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
@@ -53,8 +53,13 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
     _coordinator.addSeparator();
 
-    action = new CursesAction("Configure", &_coordinator);
+    action = new CursesAction("Con_figure", &_coordinator);
     connect(action, SIGNAL(activated()), this, SLOT(configure()));
+    action = new CursesAction("U_pdate", &_coordinator);
+    connect(action, SIGNAL(activated()), &_updateDiag, SLOT(show()));
+
+    _coordinator.addSeparator();
+
     action = new CursesAction("E_xit", &_coordinator);
     connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
@@ -441,7 +446,7 @@ QString CoordinatorConsole::quoteArg(QString arg) {
     return ar;
 }
 
-void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByteArray title, QString finMsg) {
+bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByteArray title, QString finMsg, QString workingDir) {
     _terminated = false;
 
     QString quotedCmd;
@@ -458,7 +463,7 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
         if(!binaryInfo.exists()) {
             _statusQueue << QString("Unable to locate `%1`").arg(binary);
             beep();
-            return;
+            return false;
         }
         binaryPath = binaryInfo.filePath().toLocal8Bit();
     }
@@ -484,6 +489,9 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
             usleep(600000);
         initEnv();
 
+        if(!workingDir.isEmpty())
+            chdir(workingDir.toLocal8Bit().data());
+
         char* rawPath = new char[binaryPath.size()+1];
         strcpy(rawPath, binaryPath.data());
 
@@ -504,17 +512,19 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
     }
     else if (child_pid == -1)
     {
-        _statusQueue << QString("Failed to launch `%1`").arg(quotedCmd);
+        _statusQueue << QString("Failed to fork `%1`").arg(quotedCmd);
         beep();
-        return;
+        return false;
     }
 
     endwin();
     sleep(2);
 
     int status;
+    bool ret = true;
     while (child_pid > 0 && -1 == waitpid(child_pid, &status, WUNTRACED));
     if(status != 0) {
+        ret = false;
         if(_terminated)
             _statusQueue << QString("`%1` terminated").arg(quotedCmd);
         else
@@ -529,6 +539,8 @@ void CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
     rescanAvailableFunctions();
     titleChanged();
     refresh();
+
+    return ret;
 }
 
 void CoordinatorConsole::aptUpdateUpgrade() {
@@ -550,11 +562,11 @@ void CoordinatorConsole::sudoReboot() {
 }
 
 void CoordinatorConsole::dropToShell() {
-    startShell(QStringList() << "bash", "You have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n");
+    startShell(QStringList() << "bash", "You have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n", "Shell", "", getenv("HOME"));
 }
 
 void CoordinatorConsole::dropToRootShell() {
-    startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n");
+    startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n", "Root Shell", "", "/");
 }
 
 void CoordinatorConsole::editCronTab() {

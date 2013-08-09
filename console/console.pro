@@ -23,11 +23,13 @@ exists($$PWD/../extern/GitProjectVersionQt/version.pri) : include($$PWD/../exter
 
 # Project Files
 SOURCES += main.cpp \
-    coordinatorconsole.cpp
+    coordinatorconsole.cpp \
+    updatedialog.cpp
 
 HEADERS += \
     coordinatorconsole.h \
-    screenaction.h
+    screenaction.h \
+    updatedialog.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../extern/GenericUI/core/release/ -lGenericUI
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../extern/GenericUI/core/debug/ -lGenericUI

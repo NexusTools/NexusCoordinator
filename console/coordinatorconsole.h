@@ -15,6 +15,8 @@
 #include <QTime>
 #include <QFile>
 
+#include "updatedialog.h"
+
 inline QString readHostname() {
     QFile f("/etc/hostname");
     if(f.open(QFile::ReadOnly))
@@ -76,7 +78,7 @@ public slots:
         _statusBar.setAttr(_statusBar.attr() ^ CursesLabel::Standout);
     }
 
-    void startShell(QStringList, QByteArray startMsg ="", QByteArray title="", QString finMsg ="");
+    bool startShell(QStringList, QByteArray startMsg ="", QByteArray title="", QString finMsg ="", QString workingDir ="");
     inline void updateStatusMessage() {
         QDateTime dateTime = QDateTime::currentDateTime();
         QString nextMessage;
@@ -173,6 +175,7 @@ private:
     QTimer _rescanTimer;
     QTimer _updateDateTime;
     QStringList _statusQueue;
+    CoordinatorUpdateDialog _updateDiag;
     QSettings _config;
 
 
