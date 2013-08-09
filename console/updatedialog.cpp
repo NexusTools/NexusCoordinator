@@ -53,17 +53,17 @@ void CoordinatorUpdateDialog::showImpl()  {
         return;
 
     if(!repoUrl.isEmpty()) {
-        if(!CursesDialog::continu("The source code will now be checked out and compiled. This may take a while.", "Update NexusCoordinator"))
+        CoordinatorConsole* console = (CoordinatorConsole*)CoordinatorConsole::current();
+        if(!CursesDialog::continu("The source code will now be checked out and compiled. This may take a while.", "Update NexusCoordinator", &console->_config))
             return;
 
         int ret;
-
         QDir dir = QDir::temp();
         QString tempName = "NexusCoordinator-" + QDateTime::currentDateTime().toString(Qt::ISODate);
         QString tempPath = dir.path() + QDir::separator() + tempName + QDir::separator();
-        CoordinatorConsole* console = (CoordinatorConsole*)CoordinatorConsole::current();
 
         if(QDir(tempPath).exists() || dir.mkdir(tempName)) {
+            console->_upgraded = true;
             if(!console->startShell(QStringList() << "git" << "clone" << "--recursive" << repoUrl, "", "Download Update", "", tempPath)) {
                 CursesDialog::alert("Failed to checkout source...", "Git Failed");
                 goto cleanup;
@@ -87,7 +87,6 @@ void CoordinatorUpdateDialog::showImpl()  {
                 goto cleanup;
             }
 
-            console->_upgraded = true;
             ret = console->startShell(QCoreApplication::instance()->arguments()) ? 0 : 1;
 
             endwin();
@@ -96,6 +95,7 @@ void CoordinatorUpdateDialog::showImpl()  {
             CursesDialog::alert("Cannot create directory to build in...", "Cannot Continue");
 
 cleanup:
+        console->_upgraded = false;
         return;
     }
 }

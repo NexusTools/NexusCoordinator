@@ -37,6 +37,10 @@ inline QString readHostname() {
     return "Unknown";
 }
 
+void keyboardSignal(int s) {
+    ((CoordinatorConsole*)CoordinatorConsole::current())->terminateRequested(s);
+}
+
 CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())),
             _updateDiag(this), _menuBar(this), _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),
@@ -44,12 +48,8 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             _installScreen("Install Screen", &_screens), _createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
     _upgraded = false;
-    if(shellMode) {
-        signal(SIGTSTP, SIG_IGN);
-        signal(SIGTTIN, SIG_IGN);
-        signal(SIGTTOU, SIG_IGN);
-        signal(SIGCHLD, SIG_IGN);
-    }
+    if(shellMode)
+        signal(SIGTSTP, keyboardSignal);
 
     _shellMode = shellMode;
     _updateDateTime.setInterval(1000);
@@ -409,9 +409,12 @@ void CoordinatorConsole::setTheme(QString name) {
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {
-    if(child_pid > 0)
+    if(sig == SIGTSTP)
+        kill(getpid(), SIGCONT);
+    else if(child_pid > 0) {
+        _terminated = true;
         kill(child_pid, sig);
-    else if(sig == SIGINT)
+    } else if(sig == SIGINT)
         metaObject()->invokeMethod(this, "sigIntDiag", Qt::QueuedConnection);
     else
         CursesMainWindow::terminateRequested(sig);
@@ -540,9 +543,7 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
 
     int status;
     bool ret = true;
-    while (child_pid > 0) {
-        waitpid(child_pid, &status, WUNTRACED);
-
+    while (child_pid > 0 && waitpid(child_pid, &status, WUNTRACED) != -1) {
         if(WIFSTOPPED(status)) {
             if(_upgraded)
                 kill(child_pid, SIGCONT);
@@ -551,17 +552,29 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
                 if(resp == "Continue") {
                     endwin();
                     kill(child_pid, SIGCONT);
-                } else
+                } else {
                     kill(child_pid, SIGKILL);
+                    break;
+                }
             }
         } else {
             status = WEXITSTATUS(status);
             break;
         }
     }
+    if(_upgraded) {
+        if(status != 0) {
+            printf("\ncrashed");
 
-    if(status != 0) {
+            sleep(2);
+            return false;
+        }
+        return true;
+    }
+
+    if(status != 0 || _terminated) {
         _statusQueue << QString("`%1` exited (%2)").arg(quotedCmd).arg(status);
+        ret = false;
         beep();
     } else if(!finMsg.isEmpty())
         _statusQueue << finMsg;

@@ -163,6 +163,7 @@ protected slots:
 private:
     int child_pid;
     bool _shellMode;
+    bool _terminated;
     bool _upgraded;
 
     QTimer _blinkTimer;
