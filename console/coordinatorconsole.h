@@ -33,6 +33,8 @@ inline QStringList getLoginMessages() {
 class CoordinatorConsole : public CursesMainWindow
 {
     Q_OBJECT
+
+    friend class CoordinatorUpdateDialog;
 public:
     explicit CoordinatorConsole(bool shellMode);
 
@@ -161,6 +163,7 @@ protected slots:
 private:
     int child_pid;
     bool _shellMode;
+    bool _upgraded;
 
     QTimer _blinkTimer;
     QTimer _rescanTimer;

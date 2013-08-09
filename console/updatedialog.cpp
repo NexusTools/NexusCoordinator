@@ -87,7 +87,9 @@ void CoordinatorUpdateDialog::showImpl()  {
                 goto cleanup;
             }
 
+            console->_upgraded = true;
             ret = console->startShell(QCoreApplication::instance()->arguments()) ? 0 : 1;
+
             endwin();
             _exit(ret);
         } else

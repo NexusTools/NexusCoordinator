@@ -15,10 +15,6 @@
 
 #define SCREEN_DIR "/var/run/screen"
 
-void keyboardStop(int sig) {
-    ((CoordinatorConsole*)CoordinatorConsole::current())->terminateRequested(sig);
-}
-
 inline QString readHostname() {
     QFile f("/etc/hostname");
     if(f.open(QFile::ReadOnly)) {
@@ -47,8 +43,13 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             launchVim("Vim", &_launch), launchNano("Nano", &_launch), launchW3M("W3M", &_launch), launchELinks("ELinks", &_launch), launchLynx("Lynx", &_launch),
             _installScreen("Install Screen", &_screens), _createScreen("Create Screen", &_screens), manageOtherUser("Other Screens...", &_screens), screenListSeparator(&_screens), screenNoInstancesMessage(" No Active Screens ", &_screens), _statusBar(this) {
 
-    if(shellMode)
-        signal(SIGTSTP, keyboardStop);
+    _upgraded = false;
+    if(shellMode) {
+        signal(SIGTSTP, SIG_IGN);
+        signal(SIGTTIN, SIG_IGN);
+        signal(SIGTTOU, SIG_IGN);
+        signal(SIGCHLD, SIG_IGN);
+    }
 
     _shellMode = shellMode;
     _updateDateTime.setInterval(1000);
@@ -412,8 +413,6 @@ void CoordinatorConsole::terminateRequested(int sig) {
         kill(child_pid, sig);
     else if(sig == SIGINT)
         metaObject()->invokeMethod(this, "sigIntDiag", Qt::QueuedConnection);
-    else if(sig == SIGTSTP)
-        return;
     else
         CursesMainWindow::terminateRequested(sig);
 
@@ -541,20 +540,19 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
 
     int status;
     bool ret = true;
-    int sig;
     while (child_pid > 0) {
-        while (child_pid > 0 && -1 ==
-               waitpid(child_pid, &status, WUNTRACED));
-        sig = WTERMSIG(status);
+        waitpid(child_pid, &status, WUNTRACED);
 
         if(WIFSTOPPED(status)) {
-            QString resp = CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or something generated a TSTP signal.", "Signal TSTP Captured");
-            if(resp == "Continue") {
-                endwin();
+            if(_upgraded)
                 kill(child_pid, SIGCONT);
-            } else {
-                kill(child_pid, sig = SIGKILL);
-                break;
+            else {
+                QString resp = CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or stopped the running process.", "Process Stopped");
+                if(resp == "Continue") {
+                    endwin();
+                    kill(child_pid, SIGCONT);
+                } else
+                    kill(child_pid, SIGKILL);
             }
         } else {
             status = WEXITSTATUS(status);
@@ -563,33 +561,12 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
     }
 
     if(status != 0) {
-        ret = false;
-
-        QString reason;
-        switch(sig) {
-            case SIGTERM:
-                reason = "terminated";
-                break;
-
-            case SIGKILL:
-                reason = "killed";
-                break;
-
-            case SIGQUIT:
-                reason = "quit";
-                break;
-
-            default:
-                reason = "crashed";
-                break;
-        }
-
-        _statusQueue << QString("`%1` %2 (%3)").arg(quotedCmd).arg(reason).arg(status);
+        _statusQueue << QString("`%1` exited (%2)").arg(quotedCmd).arg(status);
         beep();
     } else if(!finMsg.isEmpty())
         _statusQueue << finMsg;
     else
-        _statusQueue << QString("`%1` finished").arg(quotedCmd);
+        _statusQueue << QString("`%1` exited (%2)").arg(quotedCmd).arg(status);
     child_pid=0;
 
     rescanAvailableFunctions();
