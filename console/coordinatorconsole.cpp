@@ -305,12 +305,12 @@ void CoordinatorConsole::createUser() {
     CursesVBox* cell = new CursesVBox(columns);
     cell->setWAttr(GUIWidget::FloatCenter);
     new CursesLabel("Username", cell);
-    new CursesLineEdit(cell);
+    CursesLineEdit* user = new CursesLineEdit(cell);
 
     cell = new CursesVBox(columns);
     cell->setWAttr(GUIWidget::FloatCenter);
     new CursesLabel("Shell", cell);
-    new CursesLineEdit("/bin/nc-shell", cell);
+    CursesLineEdit* shell = new CursesLineEdit("/bin/nc-shell", cell);
 
     CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
     foreach(QString option, QStringList() << "Cre_ate User" << "_Nevermind") {
@@ -319,6 +319,8 @@ void CoordinatorConsole::createUser() {
     }
 
     diag->exec();
+    if(diag->value<QString>() == "Create User")
+        startShell(QStringList() << "sudo" << "adduser" << "--shell" << shell->text() << user->text());
 }
 
 void CoordinatorConsole::configure() {
