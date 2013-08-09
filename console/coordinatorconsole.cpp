@@ -21,12 +21,12 @@ void keyboardStop(int sig) {
 inline QString readHostname() {
     QFile f("/etc/hostname");
     if(f.open(QFile::ReadOnly)) {
-        QString hostname = QString::fromUtf8(f.readAll());
+        QString hostname = QString::fromUtf8(f.readAll()).trimmed();
         if(!hostname.isEmpty()) {
             f.close();
             f.setFileName("/etc/hostgroup");
             if(f.open(QFile::ReadOnly)) {
-                QString hostgroup = QString::fromUtf8(f.readAll());
+                QString hostgroup = QString::fromUtf8(f.readAll()).trimmed();
                 if(!hostgroup.isEmpty()) {
                     hostname += '[';
                     hostname += hostgroup;
