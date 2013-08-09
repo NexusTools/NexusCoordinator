@@ -534,7 +534,7 @@ void CoordinatorConsole::aptUpdateUpgrade() {
 }
 
 void CoordinatorConsole::aptUpdateDistUpgrade() {
-    if(CursesDialog::ensure("This could be dangerous, are you sure?", "Aggressive Upgrade"))
+    if(CursesDialog::ensure("This could be dangerous, are you sure?", "Aggressive Upgrade", &_config))
         startShell(QStringList() << "sudo" << "bash" << "-c" << "apt-get update; apt-get dist-upgrade", "Follow the instructions below.\n\n");
 }
 
@@ -543,7 +543,7 @@ void CoordinatorConsole::aptInstall(QString pkg) {
 }
 
 void CoordinatorConsole::sudoReboot() {
-    if(CursesDialog::ensure("This will reboot the server, are you sure?", "Reboot"))
+    if(CursesDialog::ensure("This will reboot the server, are you sure?", "Reboot", &_config))
         startShell(QStringList() << "sudo" << "reboot", "Enter your password to reboot.\n\n");
 }
 

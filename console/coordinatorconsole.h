@@ -134,7 +134,6 @@ protected slots:
     void configure();
     void setTheme(QString name);
 
-
     inline void installScreenPkg() {
         aptInstall("screen");
     }
