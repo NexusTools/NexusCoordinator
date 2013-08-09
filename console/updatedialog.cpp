@@ -57,14 +57,14 @@ void CoordinatorUpdateDialog::showImpl()  {
             return;
 
         int ret;
+
         QDir dir = QDir::temp();
         QString tempName = "NexusCoordinator-" + QDateTime::currentDateTime().toString(Qt::ISODate);
         QString tempPath = dir.path() + QDir::separator() + tempName + QDir::separator();
         CoordinatorConsole* console = (CoordinatorConsole*)CoordinatorConsole::current();
 
-
         if(QDir(tempPath).exists() || dir.mkdir(tempName)) {
-            if(!console->startShell(QStringList() << "git" << "clone" << "--recursive" << repoUrl, "", "Updating NexusCoordinator", "", tempPath)) {
+            if(!console->startShell(QStringList() << "git" << "clone" << "--recursive" << repoUrl, "", "Download Update", "", tempPath)) {
                 CursesDialog::alert("Failed to checkout source...", "Git Failed");
                 goto cleanup;
             }
@@ -74,20 +74,20 @@ void CoordinatorUpdateDialog::showImpl()  {
                 CursesDialog::alert("Git returned okay but, source is missing...", "Source Missing");
                 goto cleanup;
             }
-            if(!console->startShell(QStringList() << "qmake" << "CONFIG+=RELEASE", "", "Updating NexusCoordinator", "", tempPath)) {
+            if(!console->startShell(QStringList() << "qmake" << "CONFIG+=RELEASE", "", "Configuring Update", "", tempPath)) {
                 CursesDialog::alert("Failed to configure source...", "QMake Failed");
                 goto cleanup;
             }
-            if(!console->startShell(QStringList() << "make", "", "Updating NexusCoordinator", "", tempPath)) {
+            if(!console->startShell(QStringList() << "make", "", "Building Update", "", tempPath)) {
                 CursesDialog::alert("Failed to build source...", "Build Failed");
                 goto cleanup;
             }
-            if(!console->startShell(QStringList() << "sudo" << "make" << "install", "", "Updating NexusCoordinator", "", tempPath)) {
+            if(!console->startShell(QStringList() << "sudo" << "make" << "install", "", "Installing Update", "", tempPath)) {
                 CursesDialog::alert("Failed to install source...", "Install Failed");
                 goto cleanup;
             }
 
-            ret = console->startShell(QStringList() << "nc-term") ? 0 : 1;
+            ret = console->startShell(QCoreApplication::instance()->arguments()) ? 0 : 1;
             endwin();
             _exit(ret);
         } else

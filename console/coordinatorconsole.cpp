@@ -452,20 +452,26 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
     QString quotedCmd;
     QByteArray binaryPath;
     QString binary = args.first();
-    foreach(QString arg, args) {
-        if(!quotedCmd.isEmpty())
-            quotedCmd += ' ';
-
-        quotedCmd += quoteArg(arg);
-    }
     {
-        QFileInfo binaryInfo(QString("bin:%1").arg(binary));
+        QFileInfo binaryInfo(binary);
+        if(!binaryInfo.exists())
+            binaryInfo.setFile(QString("bin:%1").arg(binary));
+        else {
+            binary = binaryInfo.fileName();
+            args.replace(0, binary);
+        }
         if(!binaryInfo.exists()) {
             _statusQueue << QString("Unable to locate `%1`").arg(binary);
             beep();
             return false;
         }
         binaryPath = binaryInfo.filePath().toLocal8Bit();
+    }
+    foreach(QString arg, args) {
+        if(!quotedCmd.isEmpty())
+            quotedCmd += ' ';
+
+        quotedCmd += quoteArg(arg);
     }
 
     child_pid = fork();
