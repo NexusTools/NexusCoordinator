@@ -18,6 +18,28 @@ void keyboardStop(int sig) {
     ((CoordinatorConsole*)CoordinatorConsole::current())->terminateRequested(sig);
 }
 
+inline QString readHostname() {
+    QFile f("/etc/hostname");
+    if(f.open(QFile::ReadOnly)) {
+        QString hostname = QString::fromUtf8(f.readAll());
+        if(!hostname.isEmpty()) {
+            f.close();
+            f.setFileName("/etc/hostgroup");
+            if(f.open(QFile::ReadOnly)) {
+                QString hostgroup = QString::fromUtf8(f.readAll());
+                if(!hostgroup.isEmpty()) {
+                    hostname += '[';
+                    hostname += hostgroup;
+                    hostname += ']';
+                }
+            }
+
+            return hostname;
+        }
+    }
+    return "Unknown";
+}
+
 CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
             shellMode ? QString("NexusCoordinator Shell on %1").arg(readHostname()) : QString("NexusCoordinator V%1").arg(QCoreApplication::instance()->applicationVersion())),
             _updateDiag(this), _menuBar(this), _coordinator("Coord_inator", this), _launch("_Launch", this), _screens("Scree_ns", this), _system("S_ystem", this), _help("_Help", this),

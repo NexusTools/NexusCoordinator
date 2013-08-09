@@ -17,13 +17,6 @@
 
 #include "updatedialog.h"
 
-inline QString readHostname() {
-    QFile f("/etc/hostname");
-    if(f.open(QFile::ReadOnly))
-        return QString::fromUtf8(f.readAll());
-    return "Unknown";
-}
-
 inline QStringList getLoginMessages() {
     QStringList messages;
     messages << QString("Logged in as %1").arg(getenv("USER"));
