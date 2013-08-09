@@ -1,6 +1,7 @@
 #include "coordinatorconsole.h"
 #include "screenaction.h"
 
+#include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h>
@@ -244,10 +245,6 @@ bool ScreenAction::processEvent(QEvent *e) {
     return CursesAction::processEvent(e);
 }
 
-void CoordinatorConsole::sigTStpDiag() {
-    CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or something generated a TSTP signal.", "Signal TSTP Captured");
-}
-
 void CoordinatorConsole::sigIntDiag() {
     static bool tryReboot = false;
     if(_shellMode && !tryReboot) {
@@ -411,13 +408,9 @@ void CoordinatorConsole::setTheme(QString name) {
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {
-    if(child_pid > 0) {
-        _terminated = true;
+    if(child_pid > 0)
         kill(child_pid, sig);
-
-        if(sig == SIGTSTP)
-            metaObject()->invokeMethod(this, "sigTStpDiag", Qt::QueuedConnection);
-    } else if(sig == SIGINT)
+    else if(sig == SIGINT)
         metaObject()->invokeMethod(this, "sigIntDiag", Qt::QueuedConnection);
     else if(sig == SIGTSTP)
         return;
@@ -469,8 +462,6 @@ QString CoordinatorConsole::quoteArg(QString arg) {
 }
 
 bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByteArray title, QString finMsg, QString workingDir) {
-    _terminated = false;
-
     QString quotedCmd;
     QByteArray binaryPath;
     QString binary = args.first();
@@ -550,13 +541,50 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
 
     int status;
     bool ret = true;
-    while (child_pid > 0 && -1 == waitpid(child_pid, &status, WUNTRACED));
+    int sig;
+    while (child_pid > 0) {
+        while (child_pid > 0 && -1 ==
+               waitpid(child_pid, &status, WUNTRACED));
+        sig = WTERMSIG(status);
+
+        if(WIFSTOPPED(status)) {
+            QString resp = CursesDialog::options(QStringList() << "Con_tinue" << "_Kill", "You pressed CTRL+Z, or something generated a TSTP signal.", "Signal TSTP Captured");
+            if(resp == "Continue") {
+                endwin();
+                kill(child_pid, SIGCONT);
+            } else {
+                kill(child_pid, sig = SIGKILL);
+                break;
+            }
+        } else {
+            status = WEXITSTATUS(status);
+            break;
+        }
+    }
+
     if(status != 0) {
         ret = false;
-        if(_terminated)
-            _statusQueue << QString("`%1` terminated").arg(quotedCmd);
-        else
-            _statusQueue << QString("`%1` crashed").arg(quotedCmd);
+
+        QString reason;
+        switch(sig) {
+            case SIGTERM:
+                reason = "terminated";
+                break;
+
+            case SIGKILL:
+                reason = "killed";
+                break;
+
+            case SIGQUIT:
+                reason = "quit";
+                break;
+
+            default:
+                reason = "crashed";
+                break;
+        }
+
+        _statusQueue << QString("`%1` %2 (%3)").arg(quotedCmd).arg(reason).arg(status);
         beep();
     } else if(!finMsg.isEmpty())
         _statusQueue << finMsg;
