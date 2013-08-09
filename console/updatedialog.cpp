@@ -56,6 +56,7 @@ void CoordinatorUpdateDialog::showImpl()  {
         if(!CursesDialog::continu("The source code will now be checked out and compiled. This may take a while.", "Update NexusCoordinator"))
             return;
 
+        int ret;
         QDir dir = QDir::temp();
         QString tempName = "NexusCoordinator-" + QDateTime::currentDateTime().toString(Qt::ISODate);
         QString tempPath = dir.path() + QDir::separator() + tempName + QDir::separator();
@@ -86,7 +87,9 @@ void CoordinatorUpdateDialog::showImpl()  {
                 goto cleanup;
             }
 
-            _exit(console->startShell(QStringList() << "nc-shell") ? 0 : 1);
+            ret = console->startShell(QStringList() << "nc-term") ? 0 : 1;
+            endwin();
+            _exit(ret);
         } else
             CursesDialog::alert("Cannot create directory to build in...", "Cannot Continue");
 
