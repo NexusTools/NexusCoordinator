@@ -146,6 +146,9 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     updateStatusMessage();
     fixLayoutImpl();
     child_pid = 0;
+
+    if(getuid() == 0)
+        QTimer::singleShot(5, this, SLOT(rootMessage()));
 }
 
 void killChildAtExit() {
@@ -348,6 +351,17 @@ void CoordinatorConsole::createUser() {
         startShell(QStringList() << "sudo" << "adduser" << "--shell" << shell->text() << user->text());
 }
 
+void CoordinatorConsole::rootMessage() {
+    if(_shellMode) {
+        if(CursesDialog::options(QStringList() << "E_xit" << "Continu_e", "The root user has unrestricted access, continue?", "Root User") == "Continue")
+            return;
+    } else
+        CursesDialog::alert("This software cannot run as root.", "Root User");
+
+    endwin();
+    exit(1);
+}
+
 void CoordinatorConsole::configure() {
     CursesDialog* diag = new CursesDialog("Configure NexusCoordinator", this);
     connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
@@ -406,6 +420,88 @@ void CoordinatorConsole::setTheme(QString name) {
         return;
 
     _config.setValue("theme", name);
+}
+
+void CoordinatorConsole::updateStatusMessage() {
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QString nextMessage;
+
+    static QStringList subtleMessageQueue(getLoginMessages());
+
+    int timeout = 1500;
+    _blinkTimer.stop();
+    _statusBar.setAttr(CursesLabel::Dim);
+    if(!subtleMessageQueue.isEmpty()) {
+        if(subtleMessageQueue.size() > 1)
+            timeout += 1500;
+        nextMessage = subtleMessageQueue.takeFirst();
+    } else if(!_statusQueue.isEmpty()) {
+        flash();
+        timeout += 1500;
+        _blinkTimer.start();
+        nextMessage = _statusQueue.takeFirst();
+        _statusBar.setAttr(CursesLabel::Attr(CursesLabel::Bold | CursesLabel::Standout));
+    } else if(dateTime.time().second() % 15 == 0) {
+        switch(dateTime.time().second()) {
+            case 0:
+                nextMessage = QString("%1 V%2").arg(QCoreApplication::instance()->applicationName()).arg(QCoreApplication::instance()->applicationVersion());
+                subtleMessageQueue << QString("On %1").arg(readHostname());
+                break;
+
+            case 15:
+            {
+                QFile f("/proc/loadavg");
+                if(f.open(QFile::ReadOnly)) {
+                    QString loadAvg = QString::fromLocal8Bit(f.readAll());
+
+                    int index = loadAvg.indexOf(' ');
+                    index = loadAvg.indexOf(' ', index+1);
+                    index = loadAvg.indexOf(' ', index+1);
+
+                    nextMessage = QString("Load: %1").arg(loadAvg.mid(0, index));
+                }
+                break;
+            }
+
+            case 30:
+            {
+                QFile f("/proc/uptime");
+                if(f.open(QFile::ReadOnly)) {
+                    QString loadAvg = QString::fromLocal8Bit(f.readAll());
+
+                    int index = loadAvg.indexOf(' ');
+                    int elapsed = loadAvg.mid(0, index).toInt();
+
+
+                    nextMessage = QString("Uptime: %1").arg(elapsed);
+                }
+                break;
+            }
+
+            case 45:
+            {
+                QFile f("/proc/meminfo");
+                if(f.open(QFile::ReadOnly)) {
+                    QString loadAvg = QString::fromLocal8Bit(f.readAll());
+
+                    int index = loadAvg.indexOf(' ');
+                    index = loadAvg.indexOf(' ', index+1);
+                    index = loadAvg.indexOf(' ', index+1);
+
+                    nextMessage = QString("Memory: %1").arg(loadAvg.mid(0, index));
+                }
+                break;
+            }
+        }
+    }
+
+    if(!nextMessage.isEmpty()) {
+        _updateDateTime.stop(); // Skip 1.5 seconds, wait 1 more
+        QTimer::singleShot(timeout, &_updateDateTime, SLOT(start()));
+
+        _statusBar.setText(nextMessage);
+    } else
+        _statusBar.setText(QDateTime::currentDateTime().toString());
 }
 
 void CoordinatorConsole::terminateRequested(int sig) {

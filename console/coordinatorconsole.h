@@ -74,49 +74,7 @@ public slots:
     }
 
     bool startShell(QStringList, QByteArray startMsg ="", QByteArray title="", QString finMsg ="", QString workingDir ="");
-    inline void updateStatusMessage() {
-        QDateTime dateTime = QDateTime::currentDateTime();
-        QString nextMessage;
-
-        static QStringList loginMessages(getLoginMessages());
-
-        int timeout = 1500;
-        _blinkTimer.stop();
-        _statusBar.setAttr(CursesLabel::Dim);
-        if(!loginMessages.isEmpty()) {
-            nextMessage = loginMessages.takeFirst();
-            timeout += 1500;
-        } else if(!_statusQueue.isEmpty()) {
-            flash();
-            timeout += 1500;
-            _blinkTimer.start();
-            nextMessage = _statusQueue.takeFirst();
-            _statusBar.setAttr(CursesLabel::Attr(CursesLabel::Bold | CursesLabel::Standout));
-        } else if(dateTime.time().second() % 15 == 0) {
-            if(dateTime.time().second() == 0)
-                nextMessage = QString("%1 V%2").arg(QCoreApplication::instance()->applicationName()).arg(QCoreApplication::instance()->applicationVersion());
-            else {
-                QFile f("/proc/loadavg");
-                if(f.open(QFile::ReadOnly)) {
-                    QString loadAvg = QString::fromLocal8Bit(f.readAll());
-
-                    int index = loadAvg.indexOf(' ');
-                    index = loadAvg.indexOf(' ', index+1);
-                    index = loadAvg.indexOf(' ', index+1);
-
-                    nextMessage = QString("Load: %1").arg(loadAvg.mid(0, index));
-                }
-            }
-        }
-
-        if(!nextMessage.isEmpty()) {
-            _updateDateTime.stop(); // Skip 1.5 seconds, wait 1 more
-            QTimer::singleShot(timeout, &_updateDateTime, SLOT(start()));
-
-            _statusBar.setText(nextMessage);
-        } else
-            _statusBar.setText(QDateTime::currentDateTime().toString());
-    }
+    void updateStatusMessage();
 
     virtual void terminateRequested(int);
     void killChild();
@@ -130,6 +88,7 @@ protected:
 protected slots:
     void configure();
     void setTheme(QString name);
+    void rootMessage();
 
     inline void installScreenPkg() {
         aptInstall("screen");
