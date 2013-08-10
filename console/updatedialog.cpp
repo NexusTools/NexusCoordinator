@@ -105,7 +105,7 @@ void CoordinatorUpdateDialog::showImpl()  {
                 kill(child_pid, SIGKILL);
                 if(tLeft > 0 && WEXITSTATUS(status) == 0) {
                     if(console->_shellMode)
-                        execl("/usr/bin/nc-shell", "nc-shell", 0);
+                        execl("/bin/nc-shell", "nc-shell", 0);
                     else
                         execl("/usr/bin/nc-term", "nc-term", 0);
                 }

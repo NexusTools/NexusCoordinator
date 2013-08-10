@@ -82,9 +82,9 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
         action->disable();
         action = new CursesAction("Disconnect", &_coordinator);
         action->disable();
-
-        _coordinator.addSeparator();
     }
+
+    _coordinator.addSeparator();
 
     action = new CursesAction("Con_figure", &_coordinator);
     connect(action, SIGNAL(activated()), this, SLOT(configure()));
@@ -93,7 +93,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
     _coordinator.addSeparator();
 
-    action = new CursesAction("E_xit", &_coordinator);
+    action = new CursesAction(_shellMode ? QString("Log out %1").arg(getenv("USER")) : "E_xit", &_coordinator);
     connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
 
