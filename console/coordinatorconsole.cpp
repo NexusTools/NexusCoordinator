@@ -68,14 +68,23 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
         connect(action, SIGNAL(activated()), this, SLOT(dropToShell()), Qt::QueuedConnection);
         action = new CursesAction("Drop to _Root Shell", &_coordinator);
         connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()), Qt::QueuedConnection);
+
+        _coordinator.addSeparator();
+
+        if(getuid() != 0) {
+            action = new CursesAction("Run as User...", &_coordinator);
+            connect(action, SIGNAL(activated()), this, SLOT(runAsUser()), Qt::QueuedConnection);
+            action = new CursesAction("Run as Root", &_coordinator);
+            connect(action, SIGNAL(activated()), this, SLOT(runAsRoot()), Qt::QueuedConnection);
+        }
     } else {
         action = new CursesAction("Connect to...", &_coordinator);
         action->disable();
         action = new CursesAction("Disconnect", &_coordinator);
         action->disable();
-    }
 
-    _coordinator.addSeparator();
+        _coordinator.addSeparator();
+    }
 
     action = new CursesAction("Con_figure", &_coordinator);
     connect(action, SIGNAL(activated()), this, SLOT(configure()));
@@ -696,6 +705,15 @@ void CoordinatorConsole::aptUpdateDistUpgrade() {
 
 void CoordinatorConsole::aptInstall(QString pkg) {
     startShell(QStringList() << "sudo" << "apt-get" << "install" << pkg, "Follow the instructions below, they will help you install the required software.\n\n");
+}
+
+void CoordinatorConsole::runAsUser() {
+    QString user = CursesDialog::input("Enter the name of the user", "Run As User...");
+    startShell(QStringList() << "sudo" << "su" << "-s" << "/bin/nc-shell" << user);
+}
+
+void CoordinatorConsole::runAsRoot() {
+    startShell(QStringList() << "sudo" << "nc-term" << "--shell");
 }
 
 void CoordinatorConsole::sudoReboot() {

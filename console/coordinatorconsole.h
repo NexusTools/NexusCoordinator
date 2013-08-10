@@ -98,6 +98,8 @@ protected slots:
     void aptUpdateDistUpgrade();
 
 
+    void runAsUser();
+    void runAsRoot();
     void sudoReboot();
     void dropToShell();
     void dropToRootShell();
