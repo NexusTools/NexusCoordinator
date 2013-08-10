@@ -60,7 +60,8 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     connect(&_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkStatus()));
     connect(&_statusBar, SIGNAL(clicked()), this, SLOT(notifyClicked()));
 
-    setTheme(_config.value("theme").toString());
+    QString theme = _config.value("theme").toString();
+    setTheme(theme.isEmpty() ? (getuid() == 0 ? "Red" : "Default") : theme);
 
     CursesAction* action;
     if(shellMode) {
@@ -713,7 +714,7 @@ void CoordinatorConsole::runAsUser() {
 }
 
 void CoordinatorConsole::runAsRoot() {
-    startShell(QStringList() << "sudo" << "nc-term" << "--shell");
+    startShell(QStringList() << "sudo" << "su" << "-s" << "/bin/nc-shell");
 }
 
 void CoordinatorConsole::sudoReboot() {
