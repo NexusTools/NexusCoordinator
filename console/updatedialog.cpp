@@ -66,7 +66,7 @@ void CoordinatorUpdateDialog::showImpl()  {
 
         if(QDir(tempPath).exists() || dir.mkdir(tempName)) {
             console->_upgraded = true;
-            if(!console->startShell(QStringList() << "git" << "clone" << "--recursive" << repoUrl, "", "Download Update", "", tempPath)) {
+            if(!console->startShell(QStringList() << "git" << "clone" << "--recursive" << repoUrl, "", "Downloading Update", "", tempPath)) {
                 CursesDialog::alert("Failed to checkout source...", "Git Failed");
                 goto cleanup;
             }

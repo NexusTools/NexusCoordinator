@@ -71,9 +71,9 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
         _coordinator.addSeparator();
 
+        action = new CursesAction("Run as User...", &_coordinator);
+        connect(action, SIGNAL(activated()), this, SLOT(runAsUser()), Qt::QueuedConnection);
         if(getuid() != 0) {
-            action = new CursesAction("Run as User...", &_coordinator);
-            connect(action, SIGNAL(activated()), this, SLOT(runAsUser()), Qt::QueuedConnection);
             action = new CursesAction("Run as Root", &_coordinator);
             connect(action, SIGNAL(activated()), this, SLOT(runAsRoot()), Qt::QueuedConnection);
         }
@@ -707,8 +707,9 @@ void CoordinatorConsole::aptInstall(QString pkg) {
 }
 
 void CoordinatorConsole::runAsUser() {
-    QString user = CursesDialog::input("Enter the name of the user", "Run As User...");
-    startShell(QStringList() << "sudo" << "su" << "-s" << "/bin/nc-shell" << user);
+    QString user = CursesDialog::input("Enter the name of the user", "Run As User...").trimmed();
+    if(!user.isEmpty())
+        startShell(QStringList() << "sudo" << "su" << "-s" << "/bin/nc-shell" << user);
 }
 
 void CoordinatorConsole::runAsRoot() {
