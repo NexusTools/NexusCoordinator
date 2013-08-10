@@ -93,13 +93,12 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
     _coordinator.addSeparator();
 
-    action = new CursesAction(_shellMode ? QString("Log out %1").arg(getenv("USER")) : "E_xit", &_coordinator);
+    action = new CursesAction(_shellMode ? QString("Lo_g out %1").arg(getenv("USER")) : "E_xit", &_coordinator);
     connect(action, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 
 
     if(shellMode) {
         rescanAvailableFunctions();
-
         connect(&_createScreen, SIGNAL(activated()), this, SLOT(createScreen()));
 
         action = new CursesAction("Create User", &_system);
