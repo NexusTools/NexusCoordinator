@@ -381,7 +381,7 @@ void CoordinatorConsole::checkUpdated() {
         diag->exec();
     }
 
-    _config.setValue("version", QCoreApplication::instance()->applicationName());
+    _config.setValue("version", QCoreApplication::instance()->applicationVersion());
 }
 
 void CoordinatorConsole::rootMessage() {
