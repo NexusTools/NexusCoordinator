@@ -370,6 +370,7 @@ void CoordinatorConsole::checkUpdated() {
     if(!ver.isEmpty() && QCoreApplication::instance()->applicationVersion() != ver) {
         _config.setValue("version", QCoreApplication::instance()->applicationVersion());
         CursesDialog* diag = new CursesDialog("Coordinator Updated", this);
+        diag->setLayout(GUIContainer::VerticalLayout);
 
         new CursesLabel("NexusCoordinator has been updated from", diag);
         new CursesLabel("version %1 to %2!", diag);
