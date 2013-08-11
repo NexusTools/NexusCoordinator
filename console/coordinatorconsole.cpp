@@ -373,8 +373,9 @@ void CoordinatorConsole::checkUpdated() {
         CursesDialog* diag = new CursesDialog("Coordinator Updated", this);
         diag->setLayout(GUIContainer::VerticalLayout);
 
-        new CursesLabel("NexusCoordinator has been updated from", diag);
-        new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), diag);
+        CursesVBox* vBox = new CursesVBox(diag);
+        new CursesLabel("NexusCoordinator has been updated from", vBox);
+        new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), vBox);
 
         CursesButtonBox* btnBox = new CursesButtonBox(diag);
         foreach(QString option, QStringList() << "O_kay" << "Change_log"){
