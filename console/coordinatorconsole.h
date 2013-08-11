@@ -88,6 +88,7 @@ protected:
 protected slots:
     void configure();
     void setTheme(QString name);
+    void checkUpdated();
     void rootMessage();
 
     inline void installScreenPkg() {

@@ -161,6 +161,8 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
     if(getuid() == 0)
         QTimer::singleShot(5, this, SLOT(rootMessage()));
+    else
+        QTimer::singleShot(5, this, SLOT(checkUpdated()));
 }
 
 void killChildAtExit() {
@@ -361,6 +363,25 @@ void CoordinatorConsole::createUser() {
     diag->exec();
     if(diag->value<QString>() == "Create User")
         startShell(QStringList() << "sudo" << "adduser" << "--shell" << shell->text() << user->text());
+}
+
+void CoordinatorConsole::checkUpdated() {
+    QString ver = _config.value("version").toString();
+    if(!ver.isEmpty() && QCoreApplication::instance()->applicationVersion() != ver) {
+        _config.setValue("version", QCoreApplication::instance()->applicationVersion());
+        CursesDialog* diag = new CursesDialog("Coordinator Updated", this);
+
+        new CursesLabel("NexusCoordinator has been updated from", diag);
+        new CursesLabel("version %1 to %2!", diag);
+
+        CursesButtonBox* btnBox = new CursesButtonBox(diag);
+        new CursesButton("O_kay", GUIWidget::Normal, btnBox);
+        new CursesButton("Chan_gelog", GUIWidget::Normal, btnBox);
+
+        diag->exec();
+    }
+
+    _config.setValue("version", QCoreApplication::instance()->applicationName());
 }
 
 void CoordinatorConsole::rootMessage() {
