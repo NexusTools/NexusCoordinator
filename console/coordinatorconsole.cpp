@@ -367,13 +367,14 @@ void CoordinatorConsole::createUser() {
 
 void CoordinatorConsole::checkUpdated() {
     QString ver = _config.value("version").toString();
+    QString cver = QCoreApplication::instance()->applicationVersion();
     if(!ver.isEmpty() && QCoreApplication::instance()->applicationVersion() != ver) {
         _config.setValue("version", QCoreApplication::instance()->applicationVersion());
         CursesDialog* diag = new CursesDialog("Coordinator Updated", this);
         diag->setLayout(GUIContainer::VerticalLayout);
 
         new CursesLabel("NexusCoordinator has been updated from", diag);
-        new CursesLabel("version %1 to %2!", diag);
+        new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), diag);
 
         CursesButtonBox* btnBox = new CursesButtonBox(diag);
         new CursesButton("O_kay", GUIWidget::Normal, btnBox);
