@@ -67,13 +67,16 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
     if(shellMode) {
         action = new CursesAction("_Drop to Shell", &_coordinator);
         connect(action, SIGNAL(activated()), this, SLOT(dropToShell()), Qt::QueuedConnection);
-        action = new CursesAction("Drop to _Root Shell", &_coordinator);
-        connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()), Qt::QueuedConnection);
+        if(getuid() != 0) {
+            action = new CursesAction("Drop to _Root Shell", &_coordinator);
+            connect(action, SIGNAL(activated()), this, SLOT(dropToRootShell()), Qt::QueuedConnection);
 
-        _coordinator.addSeparator();
+            _coordinator.addSeparator();
+        }
 
         action = new CursesAction("Run as User...", &_coordinator);
         connect(action, SIGNAL(activated()), this, SLOT(runAsUser()), Qt::QueuedConnection);
+
         if(getuid() != 0) {
             action = new CursesAction("Run as Root", &_coordinator);
             connect(action, SIGNAL(activated()), this, SLOT(runAsRoot()), Qt::QueuedConnection);
