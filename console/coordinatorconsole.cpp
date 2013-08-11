@@ -389,7 +389,7 @@ void CoordinatorConsole::configure() {
         connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
     hBox = new CursesHBox(Spacing(1, 0), diag);
-    foreach(QString option, QStringList() << "C_yan" << "_Blue" << "_Red") {
+    foreach(QString option, QStringList() << "C_yan" << "_Blue" << "_Red" << "_Yellow"){
         CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, hBox);
         connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
@@ -427,6 +427,9 @@ void CoordinatorConsole::setTheme(QString name) {
         init_pair(2, COLOR_WHITE, COLOR_BLACK);
     } else if(name == "Blue") {
         init_pair(1, COLOR_BLUE, COLOR_BLACK);
+        init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    } else if(name == "Yellow") {
+        init_pair(1, COLOR_YELLOW, COLOR_BLACK);
         init_pair(2, COLOR_WHITE, COLOR_BLACK);
     } else
         return;
