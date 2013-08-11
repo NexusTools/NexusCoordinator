@@ -368,23 +368,34 @@ void CoordinatorConsole::createUser() {
 void CoordinatorConsole::checkUpdated() {
     QString ver = _config.value("version").toString();
     QString cver = QCoreApplication::instance()->applicationVersion();
-    if(!ver.isEmpty() && QCoreApplication::instance()->applicationVersion() != ver) {
-        _config.setValue("version", QCoreApplication::instance()->applicationVersion());
-        CursesDialog* diag = new CursesDialog("Coordinator Updated", this);
-        diag->setLayout(GUIContainer::VerticalLayout);
+
+    CursesDialog* diag;
+    QStringList options;
+    if(ver.isEmpty()) {
+        diag = new CursesDialog("First Run", this);
+
+        CursesVBox* vBox = new CursesVBox(diag);
+        new CursesLabel("If this is your first time running NexusCoordinator,", vBox);
+        new CursesLabel("it's highly recommended you view the help contents.", vBox);
+        options << "Clos_e" << "_Help Contents";
+    } else if(QCoreApplication::instance()->applicationVersion() != ver) {
+        diag = new CursesDialog("Coordinator Updated", this);
 
         CursesVBox* vBox = new CursesVBox(diag);
         new CursesLabel("NexusCoordinator has been updated from", vBox);
         new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), vBox);
+        options << "O_kay" << "Change_log";
+    } else
+        return;
 
-        CursesButtonBox* btnBox = new CursesButtonBox(diag);
-        foreach(QString option, QStringList() << "O_kay" << "Change_log"){
-            CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, btnBox);
-            connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
-        }
-
-        diag->exec();
+    CursesButtonBox* btnBox = new CursesButtonBox(diag);
+    foreach(QString option, options){
+        CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, btnBox);
+        connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
+
+    diag->setLayout(GUIContainer::VerticalLayout);
+    diag->exec();
 
     _config.setValue("version", QCoreApplication::instance()->applicationVersion());
 }
@@ -415,7 +426,7 @@ void CoordinatorConsole::configure() {
         connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
     hBox = new CursesHBox(Spacing(1, 0), diag);
-    foreach(QString option, QStringList() << "C_yan" << "_Blue" << "_Red" << "_Yellow"){
+    foreach(QString option, QStringList() << "C_yan" << "_Blue" << "_Red" << "Yello_w"){
         CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, hBox);
         connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
