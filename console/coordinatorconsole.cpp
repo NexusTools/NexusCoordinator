@@ -727,7 +727,8 @@ void CoordinatorConsole::dropToShell() {
 }
 
 void CoordinatorConsole::dropToRootShell() {
-    startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n", "Root Shell", "", "/");
+    if(CursesDialog::options(QStringList() << "E_xit" << "Continu_e", "The root user has unrestricted access, continue?", "Root Shell", &_config) == "Continue")
+        startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n", "Root Shell", "", "/");
 }
 
 void CoordinatorConsole::editCronTab() {
