@@ -384,7 +384,9 @@ void CoordinatorConsole::checkUpdated() {
         CursesVBox* vBox = new CursesVBox(diag);
         new CursesLabel("NexusCoordinator has been updated from", vBox);
         new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), vBox);
-        options << "O_kay" << "Change_log";
+        options << "O_kay";
+        if(_config.contains("last-commit"))
+            options << "Change_log";
     } else
         return;
 
@@ -397,6 +399,11 @@ void CoordinatorConsole::checkUpdated() {
     diag->setLayout(GUIContainer::VerticalLayout);
     diag->exec();
 
+#ifndef GIT_COMMIT
+    _config.remove("last-commit");
+#else
+    _config.setValue("last-commit", GIT_COMMIT);
+#endif
     _config.setValue("version", QCoreApplication::instance()->applicationVersion());
 }
 
