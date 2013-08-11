@@ -377,8 +377,10 @@ void CoordinatorConsole::checkUpdated() {
         new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), diag);
 
         CursesButtonBox* btnBox = new CursesButtonBox(diag);
-        new CursesButton("O_kay", GUIWidget::Normal, btnBox);
-        new CursesButton("Chan_gelog", GUIWidget::Normal, btnBox);
+        foreach(QString option, QStringList() << "O_kay" << "Change_log"){
+            CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, btnBox);
+            connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+        }
 
         diag->exec();
     }
