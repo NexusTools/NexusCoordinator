@@ -373,7 +373,7 @@ void CoordinatorConsole::createUser() {
 
             static QRegExp userReg("[a-z_][a-z0-9_]+");
             if(!userReg.exactMatch(user->text())) {
-                CursesDialog::alert("Username should consist only of letters, numbers and underscores.\nAnd should not start with a numbers.", "Invalid Username");
+                CursesDialog::alert("Username should consist only of letters, numbers and underscores.\nAnd should not start with a number.", "Invalid Username");
                 continue;
             }
             if(shell->text().isEmpty()) {
