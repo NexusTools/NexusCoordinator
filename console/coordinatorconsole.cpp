@@ -336,7 +336,6 @@ void CoordinatorConsole::createScreen() {
 
 void CoordinatorConsole::createUser() {
     CursesDialog* diag = new CursesDialog("Create User", this);
-    connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
     diag->setLayout(GUIContainer::VerticalLayout);
 
     CursesVBox* msg = new CursesVBox(diag);
@@ -356,7 +355,7 @@ void CoordinatorConsole::createUser() {
     cell = new CursesVBox(columns);
     cell->setWAttr(GUIWidget::FloatCenter);
     new CursesLabel("Shell", cell);
-    CursesLineEdit* shell = new CursesLineEdit("/bin/nc-shell", cell);
+    CursesLineEdit* shell = new CursesLineEdit("nc-shell", cell);
 
     CursesButtonBox* buttonContainer = new CursesButtonBox(diag);
     foreach(QString option, QStringList() << "Cre_ate User" << "_Nevermind") {
@@ -364,9 +363,41 @@ void CoordinatorConsole::createUser() {
         connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
     }
 
-    diag->exec();
-    if(diag->value<QString>() == "Create User")
-        startShell(QStringList() << "sudo" << "adduser" << "--shell" << shell->text() << user->text());
+    forever {
+        diag->exec();
+        if(diag->value<QString>() == "Create User") {
+            if(user->text().isEmpty()) {
+                CursesDialog::alert("You didn't to enter a username.", "Missing Username");
+                continue;
+            }
+
+            static QRegExp userReg("[a-z\\d\\.@_][\\-a-z\\d\\.@_]+\\$?");
+            if(!userReg.exactMatch(user->text())) {
+                CursesDialog::alert("Username should consist only of letters, digits,\nunderscores, periods, at signs and dashes, and not\nstart with a dash (as defined by IEEE Std 1003.1-2001).", "Invalid Username");
+                continue;
+            }
+            if(shell->text().isEmpty()) {
+                if(CursesDialog::ensure("Would you like to disable shell access for this new user?", "Mising Shell"))
+                    shell->setText("false");
+                else
+                    continue;
+            }
+            QFileInfo shellBin(QString("bin:%1").arg(shell->text()));
+
+            if(!shellBin.exists()) {
+                CursesDialog::alert("The shell you entered does not exist in the $PATH.\nIf you want to disable shell access, enter `/bin/false`.", "Invalid Shell");
+                continue;
+            } else if(!shellBin.isExecutable()) {
+                CursesDialog::alert("The shell you entered is not executable.", "Invalid Shell");
+                continue;
+            }
+
+            startShell(QStringList() << "sudo" << "adduser" << "--shell" << shellBin.absoluteFilePath() << user->text());
+        }
+
+        break;
+    }
+    diag->deleteLater();
 }
 
 void CoordinatorConsole::checkUpdated() {
