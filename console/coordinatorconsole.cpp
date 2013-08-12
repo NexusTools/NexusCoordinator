@@ -397,7 +397,10 @@ void CoordinatorConsole::createUser() {
 
         break;
     }
-    diag->deleteLater();
+    if(diag->isExpanded())
+        connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
+    else
+        diag->deleteLater();
 }
 
 void CoordinatorConsole::checkUpdated() {
