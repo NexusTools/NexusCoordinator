@@ -120,6 +120,10 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
         _system.addSeparator();
 
+        action = new CursesAction("Sta_tistics", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(statistics()));
+        action = new CursesAction("Hard_ware", &_system);
+        connect(action, SIGNAL(activated()), this, SLOT(hardware()));
         action = new CursesAction("Re_boot", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(sudoReboot()));
 

@@ -59,7 +59,6 @@ void CoordinatorUpdateDialog::showImpl()  {
         if(!CursesDialog::continu("The source code will now be checked out and compiled. This may take a while.", "Update NexusCoordinator", &console->_config))
             return;
 
-        int ret;
         QDir dir = QDir::temp();
         QString tempName = "NexusCoordinator-" + QDateTime::currentDateTime().toString(Qt::ISODate);
         QString tempPath = dir.path() + QDir::separator() + tempName + QDir::separator();
