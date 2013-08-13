@@ -567,8 +567,7 @@ void CoordinatorConsole::updateStatusMessage() {
                     QString loadAvg = QString::fromLocal8Bit(f.readAll());
 
                     int index = loadAvg.indexOf(' ');
-                    int elapsed = loadAvg.mid(0, index).toInt();
-
+                    int elapsed = (int)loadAvg.mid(0, index).toFloat();
 
                     nextMessage = QString("Uptime: %1").arg(elapsed);
                 }

@@ -32,6 +32,29 @@ CoordinatorUpdateDialog::CoordinatorUpdateDialog(CursesMainWindow *main) :
 
 }
 
+bool removeDir(const QString & dirName)
+{
+    bool result;
+    QDir dir(dirName);
+
+    if (dir.exists(dirName)) {
+        foreach(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+            if (info.isDir() && !info.isSymLink()) {
+                result = removeDir(info.absoluteFilePath());
+            }
+            else {
+                result = QFile::remove(info.absoluteFilePath());
+            }
+
+            if (!result) {
+                return result;
+            }
+        }
+        result = dir.rmdir(dirName);
+    }
+    return result;
+}
+
 void CoordinatorUpdateDialog::showImpl()  {
     CursesDialog::showImpl();
     QString repoUrl;
@@ -115,8 +138,14 @@ void CoordinatorUpdateDialog::showImpl()  {
             CursesDialog::alert("Cannot create directory to build in...", "Cannot Continue");
 
 cleanup:
+        if(QDir(tempPath).exists())
+            removeDir(tempPath);
+#ifdef LEGACY_QT
+#else
+            QDir(tempPath).removeRecursively();
+#endif
+
         console->_upgraded = false;
         console->titleChanged();
-        return;
     }
 }
