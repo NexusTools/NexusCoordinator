@@ -83,7 +83,7 @@ void CoordinatorUpdateDialog::showImpl()  {
             return;
 
         QDir dir = QDir::temp();
-        QString tempName = "NexusCoordinator-" + QDateTime::currentDateTime().toString(Qt::ISODate);
+        QString tempName = QString("NexusCoordinator-Build-QT%1-%2").arg(QT_VERSION_STR).arg(QDateTime::currentDateTime().toString(Qt::ISODate));
         QString tempPath = dir.path() + QDir::separator() + tempName + QDir::separator();
 
         if(QDir(tempPath).exists() || dir.mkdir(tempName)) {
