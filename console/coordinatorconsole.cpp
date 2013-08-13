@@ -408,6 +408,7 @@ void CoordinatorConsole::checkUpdated() {
     QString cver = QCoreApplication::instance()->applicationVersion();
 
     CursesDialog* diag;
+    CursesCheckBox* checkBox =0;
     QStringList options;
     if(ver.isEmpty()) {
         diag = new CursesDialog("First Run", this);
@@ -417,26 +418,40 @@ void CoordinatorConsole::checkUpdated() {
         new CursesLabel("it's highly recommended you view the help contents.", vBox);
         options << "Clos_e" << "_Help Contents";
     } else if(QCoreApplication::instance()->applicationVersion() != ver) {
+        bool ignoreUpdated = _config.value("ignore-updated").toBool();
+        if(ignoreUpdated)
+            goto done;
+
         diag = new CursesDialog("Coordinator Updated", this);
 
         CursesVBox* vBox = new CursesVBox(diag);
         new CursesLabel("NexusCoordinator has been updated from", vBox);
         new CursesLabel(QString("version %1 to %2!").arg(ver).arg(cver), vBox);
+        checkBox = new CursesCheckBox("Don't show this again", diag);
+
         options << "O_kay";
         if(_config.contains("last-commit"))
             options << "Change_log";
     } else
         return;
 
-    CursesButtonBox* btnBox = new CursesButtonBox(diag);
-    foreach(QString option, options){
-        CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, btnBox);
-        connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+    {
+        connect(diag, SIGNAL(finished()), diag, SLOT(deleteLater()));
+
+        CursesButtonBox* btnBox = new CursesButtonBox(diag);
+        foreach(QString option, options){
+            CursesButton* act = new CursesButton(option, GUIWidget::FloatCenter, btnBox);
+            connect(act, SIGNAL(selected(QVariant)), diag, SLOT(answer(QVariant)));
+        }
+
+        diag->setLayout(GUIContainer::VerticalLayout);
+        diag->exec();
+
+        if(checkBox && checkBox->isChecked())
+            _config.setValue("ignore-updated", true);
     }
 
-    diag->setLayout(GUIContainer::VerticalLayout);
-    diag->exec();
-
+done:
 #ifndef GIT_HEAD
     _config.remove("last-commit");
 #else
