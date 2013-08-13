@@ -32,6 +32,7 @@ CoordinatorUpdateDialog::CoordinatorUpdateDialog(CursesMainWindow *main) :
 
 }
 
+#ifdef LEGACY_QT
 bool removeDir(const QString & dirName)
 {
     bool result;
@@ -54,6 +55,7 @@ bool removeDir(const QString & dirName)
     }
     return result;
 }
+#endif
 
 void CoordinatorUpdateDialog::showImpl()  {
     CursesDialog::showImpl();
@@ -139,8 +141,8 @@ void CoordinatorUpdateDialog::showImpl()  {
 
 cleanup:
         if(QDir(tempPath).exists())
-            removeDir(tempPath);
 #ifdef LEGACY_QT
+            removeDir(tempPath);
 #else
             QDir(tempPath).removeRecursively();
 #endif
