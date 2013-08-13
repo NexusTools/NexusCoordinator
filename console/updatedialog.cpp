@@ -32,7 +32,6 @@ CoordinatorUpdateDialog::CoordinatorUpdateDialog(CursesMainWindow *main) :
 
 }
 
-#ifdef LEGACY_QT
 bool removeDir(const QString & dirName)
 {
     bool result;
@@ -55,7 +54,6 @@ bool removeDir(const QString & dirName)
     }
     return result;
 }
-#endif
 
 void CoordinatorUpdateDialog::showImpl()  {
     CursesDialog::showImpl();
@@ -114,6 +112,7 @@ void CoordinatorUpdateDialog::showImpl()  {
             }
 
             int status;
+            removeDir(tempPath);
             console->titleChanged();
             int child_pid = fork();
             if (child_pid == 0) {
@@ -135,17 +134,13 @@ void CoordinatorUpdateDialog::showImpl()  {
                 }
 
                 CursesDialog::alert("The built update could not be run...", "Update Failed");
+                return;
             }
         } else
             CursesDialog::alert("Cannot create directory to build in...", "Cannot Continue");
 
 cleanup:
-        if(QDir(tempPath).exists())
-#ifdef LEGACY_QT
-            removeDir(tempPath);
-#else
-            QDir(tempPath).removeRecursively();
-#endif
+        removeDir(tempPath);
 
         console->_upgraded = false;
         console->titleChanged();
