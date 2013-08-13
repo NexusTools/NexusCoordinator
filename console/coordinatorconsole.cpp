@@ -437,10 +437,10 @@ void CoordinatorConsole::checkUpdated() {
     diag->setLayout(GUIContainer::VerticalLayout);
     diag->exec();
 
-#ifndef GIT_COMMIT
+#ifndef GIT_HEAD
     _config.remove("last-commit");
 #else
-    _config.setValue("last-commit", GIT_COMMIT);
+    _config.setValue("last-commit", GIT_HEAD);
 #endif
     _config.setValue("version", QCoreApplication::instance()->applicationVersion());
 }
