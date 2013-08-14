@@ -115,7 +115,7 @@ CoordinatorConsole::CoordinatorConsole(bool shellMode) : CursesMainWindow(
 
         action = new CursesAction("Install _Updates", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateUpgrade()));
-        action = new CursesAction("Agressive Upgrade", &_system);
+        action = new CursesAction("Aggressive Upgrade", &_system);
         connect(action, SIGNAL(activated()), this, SLOT(aptUpdateDistUpgrade()));
 
         _system.addSeparator();
