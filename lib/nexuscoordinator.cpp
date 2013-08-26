@@ -56,8 +56,8 @@ bool NexusCoordinator::readConfig(QVariantMap data) {
 
 CoordinatorService* NexusCoordinator::createService(QString name, QString clazz, QVariantMap config) {
     CoordinatorService* service = _services.value(name);
-    if(service && (!service->provider() ||
-                   service->provider()->name() != clazz)) {
+    if(service && (!service->module() ||
+                   service->module()->name() != clazz)) {
         service->deleteLater();
         service = 0;
     }
@@ -99,5 +99,5 @@ Module::Ref NexusCoordinator::loadModule(QVariant def) {
 }
 
 QVariant CoordinatorService::defaultConfig(QString key) {
-    return provider()->metaData().value("DefaultConfig").toMap().value(key);
+    return module()->metaData().value("DefaultConfig").toMap().value(key);
 }

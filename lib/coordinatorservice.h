@@ -66,7 +66,7 @@ protected:
         QVariant val = _config.value(name);
         if(val.canConvert<T>())
             return val.value<T>();
-        if(provider()) {
+        if(module()) {
             val = defaultConfig(name);
             if(val.canConvert<T>())
                 return val.value<T>();
