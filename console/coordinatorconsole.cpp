@@ -217,7 +217,6 @@ void CoordinatorConsole::rescanAvailableFunctions() {
                 static QRegExp nameFormat("(\\d+)\\.(.+)");
                 foreach(QFileInfo info, userDir.entryInfoList(QDir::Files | QDir::System | QDir::Hidden, QDir::Name)) {
                     QString name = info.fileName();
-
                     if(!nameFormat.exactMatch(name))
                         continue;
 
