@@ -821,7 +821,6 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
 	titleChanged();
     refresh();
 
-	QTimer::singleShot(50, this, "updateTitle");
     return ret;
 }
 
