@@ -746,17 +746,20 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
 		}
 		rawArgs[i] = 0;
 
-		i = 0;
-		QStringList environ = QProcess::systemEnvironment();
-		environ.append(QString("HOSTSTR=%1").arg(readHostname()));
-		char** rawEnviron = new char*[environ.length()+1];
-		for(; i<environ.length(); i++) {
-			rawEnviron[i] = new char[environ[i].length()+1];
-			strcpy(rawEnviron[i], environ[i].toLocal8Bit().data());
-		}
-		rawEnviron[i] = 0;
+		if(args.first() != "sudo") {
+			i = 0;
+			QStringList environ = QProcess::systemEnvironment();
+			environ.append(QString("HOSTSTR=%1").arg(readHostname()));
+			char** rawEnviron = new char*[environ.length()+1];
+			for(; i<environ.length(); i++) {
+				rawEnviron[i] = new char[environ[i].length()+1];
+				strcpy(rawEnviron[i], environ[i].toLocal8Bit().data());
+			}
+			rawEnviron[i] = 0;
 
-		execve(rawPath, rawArgs, rawEnviron);
+			execve(rawPath, rawArgs, rawEnviron);
+		} else
+			execv(rawPath, rawArgs);
         printf("\n\nFailed to launch...");
         fflush(stdout);
         sleep(1);
@@ -866,7 +869,7 @@ void CoordinatorConsole::dropToRootShell() {
 		args << "sudo" << "bash";
 		if(rcFilePath.exists())
 			args << "--rcfile" << rcFilePath.absoluteFilePath();
-        startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n", "Root Shell", "", "/");
+		startShell(args, "You have been dropped to a temporary shell.\n\n", "Root Shell", "", "/");
 	}
 }
 
