@@ -91,6 +91,9 @@ protected slots:
     void checkUpdated();
     void rootMessage();
 
+	inline void updateTitle() {
+		titleChanged();
+	}
     inline void installScreenPkg() {
         aptInstall("screen");
     }
@@ -115,9 +118,7 @@ protected slots:
     void runLynx(QString url =QString());
     void runW3M(QString url =QString());
 
-
     void createScreen();
-
 
     void createUser();
     void rescanAvailableFunctions();

@@ -53,3 +53,10 @@ unix:!symbian {
 	}
 	INSTALLS += target
 }
+
+OTHER_FILES += \
+    root.bashrc \
+    bashrc
+
+RESOURCES += \
+    resources.qrc

@@ -127,6 +127,10 @@ void CoordinatorUpdateDialog::showImpl()  {
 
                 kill(child_pid, SIGKILL);
                 if(tLeft > 0 && WEXITSTATUS(status) == 0) {
+					if(!console->startShell(QStringList() << "sudo" << "nc-term" << "unpack", "", "Installing Update", "", tempPath)) {
+						CursesDialog::alert("Some files could not be installed...", "Install Incomplete");
+					}
+
                     if(console->_shellMode)
                         execl("/bin/nc-shell", "nc-shell", 0);
                     else

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include <QResource>
 #include <QMutexLocker>
 #include <QDateTime>
 #include <QThread>
@@ -99,6 +100,30 @@ int main(int argc, char *argv[])
     a.setOrganizationName("NexusTools");
     a.setApplicationName("NexusCoordinator");
     a.setApplicationVersion(VERSION);
+
+	if(a.arguments().contains("--unpack")) {
+		qDebug() << "Unpacking Helper Files...";
+
+		int fails = 0;
+		QMap<QString, QString> copyMap;
+		copyMap.insert(":/bashrc", "/etc/nexus.bashrc");
+		copyMap.insert(":/root.bashrc", "/etc/nexus.root.bashrc");
+
+		QMap<QString, QString>::iterator map;
+		for (map = copyMap.begin(); map != copyMap.end(); ++map) {
+			QFile in(map.key());
+			if(!in.open(QFile::ReadOnly))
+				continue;
+
+			QFile out(map.value());
+			if(!out.open(QFile::WriteOnly))
+				continue;
+
+			out.write(in.readAll());
+		}
+
+		exit(fails);
+	}
 
 #ifdef LEGACY_QT
     qInstallMsgHandler(__msgOutput);

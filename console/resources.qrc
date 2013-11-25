@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>root.bashrc</file>
+        <file>bashrc</file>
+    </qresource>
+</RCC>

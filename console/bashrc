@@ -1,0 +1,4 @@
+. /etc/bash.bashrc
+
+PROMPT_COMMAND='echo -ne "\033]0;Bash Shell on ${USER}@${HOSTSTR}\007"'
+PS1="\[\033[1;34m\]\u@${HOSTSTR}:\w$\[\033[0m\] "

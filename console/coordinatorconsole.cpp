@@ -11,30 +11,46 @@
 #include <cursesdialog.h>
 
 #include <QCoreApplication>
+#include <QResource>
+#include <QProcess>
 #include <QDir>
 
 #define SCREEN_DIR "/var/run/screen"
 
 inline QString readHostname() {
-    QFile f("/etc/hostname");
-    if(f.open(QFile::ReadOnly)) {
-        QString hostname = QString::fromUtf8(f.readAll()).trimmed();
-        if(!hostname.isEmpty()) {
-            f.close();
-            f.setFileName("/etc/hostgroup");
-            if(f.open(QFile::ReadOnly)) {
-                QString hostgroup = QString::fromUtf8(f.readAll()).trimmed();
-                if(!hostgroup.isEmpty()) {
-                    hostname += '[';
-                    hostname += hostgroup;
-                    hostname += ']';
-                }
-            }
+	static QString hostname;
+	if(hostname.isEmpty()) {
+		QFile f("/etc/hostname");
+		if(f.open(QFile::ReadOnly)) {
+			hostname = QString::fromUtf8(f.readAll()).trimmed();
+			if(!hostname.isEmpty()) {
+				f.close();
+				QString hostgroup;
+				f.setFileName("/etc/hostgroup");
+				if(f.open(QFile::ReadOnly))
+					hostgroup = QString::fromUtf8(f.readAll()).trimmed();
 
-            return hostname;
-        }
-    }
-    return "Unknown";
+				if(hostgroup.isEmpty()) {
+					QRegExp reg("([\\w\\d]+)\\.([\\w\\d]+)(\\.\\w[2,3])?", Qt::CaseInsensitive, QRegExp::RegExp2);
+					if(reg.exactMatch(hostname))
+						hostgroup = reg.cap(1);
+				}
+
+				int pos = hostname.indexOf('.');
+				if(pos > -1)
+					hostname = hostname.left(pos);
+
+				if(!hostgroup.isEmpty()) {
+					hostname += '[';
+					hostname += hostgroup;
+					hostname += ']';
+				}
+			}
+		}
+		if(hostname.isEmpty())
+			hostname = "unknown";
+	}
+	return hostname;
 }
 
 void keyboardSignal(int s) {
@@ -722,15 +738,25 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
         char* rawPath = new char[binaryPath.size()+1];
         strcpy(rawPath, binaryPath.data());
 
-        int i = 0;
-        char** rawArgs = new char*[args.length()+1];
-        for(; i<args.length(); i++) {
-            rawArgs[i] = new char[args[i].length()+1];
-            strcpy(rawArgs[i], args[i].toLocal8Bit().data());
-        }
-        rawArgs[i] = 0;
+		int i = 0;
+		char** rawArgs = new char*[args.length()+1];
+		for(; i<args.length(); i++) {
+			rawArgs[i] = new char[args[i].length()+1];
+			strcpy(rawArgs[i], args[i].toLocal8Bit().data());
+		}
+		rawArgs[i] = 0;
 
-        execv(rawPath, rawArgs);
+		i = 0;
+		QStringList environ = QProcess::systemEnvironment();
+		environ.append(QString("HOSTSTR=%1").arg(readHostname()));
+		char** rawEnviron = new char*[environ.length()+1];
+		for(; i<environ.length(); i++) {
+			rawEnviron[i] = new char[environ[i].length()+1];
+			strcpy(rawEnviron[i], environ[i].toLocal8Bit().data());
+		}
+		rawEnviron[i] = 0;
+
+		execve(rawPath, rawArgs, rawEnviron);
         printf("\n\nFailed to launch...");
         fflush(stdout);
         sleep(1);
@@ -788,10 +814,11 @@ bool CoordinatorConsole::startShell(QStringList args, QByteArray startMsg, QByte
         _statusQueue << QString("`%1` exited (%2)").arg(quotedCmd).arg(status);
     child_pid=0;
 
-    rescanAvailableFunctions();
-    titleChanged();
+	rescanAvailableFunctions();
+	titleChanged();
     refresh();
 
+	QTimer::singleShot(50, this, "updateTitle");
     return ret;
 }
 
@@ -824,12 +851,23 @@ void CoordinatorConsole::sudoReboot() {
 }
 
 void CoordinatorConsole::dropToShell() {
-    startShell(QStringList() << "bash", "You have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n", "Shell", "", getenv("HOME"));
+	static QFileInfo rcFilePath("/etc/nexus.bashrc");
+	QStringList args;
+	args << "bash";
+	if(rcFilePath.exists())
+		args << "--rcfile" << rcFilePath.absoluteFilePath();
+	startShell(args, "You have been dropped to a temporary shell.\nNexusCoordinator is still running, type 'exit' to return.\n\n", "Shell", "", getenv("HOME"));
 }
 
 void CoordinatorConsole::dropToRootShell() {
-    if(CursesDialog::options(QStringList() << "Continu_e" << "Ca_ncel", "The root user has unrestricted access, continue?", "Root Shell", &_config) == "Continue")
+	if(CursesDialog::options(QStringList() << "Continu_e" << "Ca_ncel", "The root user has unrestricted access, continue?", "Root Shell", &_config) == "Continue") {
+		static QFileInfo rcFilePath("/etc/nexus.root.bashrc");
+		QStringList args;
+		args << "sudo" << "bash";
+		if(rcFilePath.exists())
+			args << "--rcfile" << rcFilePath.absoluteFilePath();
         startShell(QStringList() << "sudo" << "bash", "You have been dropped to a temporary shell.\n\n", "Root Shell", "", "/");
+	}
 }
 
 void CoordinatorConsole::editCronTab() {
